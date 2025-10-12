@@ -88,7 +88,7 @@ TuringMachine FileParser::parseFile(const std::string& filename) {
 			if (c != '.') // Si el símbolo es epsilon, puedes manejarlo aparte
 				stackPushSet.push_back(Symbol(c));
 		}
-		Transition transition(from, to, strSym, stkSym, stackPushSet);
+		Transition transition(from, to, strSym, stkSym);
 		transitionObjects.push_back(transition);
 	}
 	// Aquí deberías parsear las transiciones si tienes la clase Transition
