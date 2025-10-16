@@ -1,16 +1,30 @@
 #include "transition.h"
 
-std::ostream& operator<<(std::ostream& os, const Transition& t){
-  os << "Transition(" 
-    << t.getFrom() << " -> " << t.getTo() 
-    << ", input: " << t.getStringSymbol() 
-    << ", stack: " << t.getStackSymbol()
-    << ", push: {";
-  for (size_t i = 0; i < t.getStackPushSymbols().size(); ++i) {
-    if (i > 0)
-      os << ", ";
-    os << t.getStackPushSymbols()[i];
+static void printSymbols(std::ostream& os, const std::vector<Symbol>& syms) {
+  os << '[';
+  for (size_t i = 0; i < syms.size(); ++i) {
+    if (i) os << ' ';
+    os << syms[i];
   }
-  os << "})";
+  os << ']';
+}
+
+static void printMoves(std::ostream& os, const std::vector<Moves>& moves) {
+  os << '[';
+  for (size_t i = 0; i < moves.size(); ++i) {
+    if (i) os << ' ';
+    os << moves[i];
+  }
+  os << ']';
+}
+
+std::ostream& operator<<(std::ostream& os, const Transition& t){
+  os << "Transition(" << t.getFrom() << " -> " << t.getTo() << ", read: ";
+  printSymbols(os, t.getReadSymbols());
+  os << ", write: ";
+  printSymbols(os, t.getWriteSymbols());
+  os << ", moves: ";
+  printMoves(os, t.getMovements());
+  os << ")";
   return os;
 }

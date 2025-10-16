@@ -12,6 +12,8 @@ int main (int argc, char* argv[]) {
   auto flag = std::get<2>(args);
   FileParser parser;
   TuringMachine machine = parser.parseFile(fileIn);
+  // Print the parsed Turing Machine to stdout
+  // std::cout << machine << std::endl;
   std::ifstream inputStrings(fileOut); // fileOut es el fichero de cadenas
   if (!inputStrings.is_open()) {
     std::cerr << "No se pudo abrir el archivo de cadenas: " << fileOut << std::endl;
@@ -19,6 +21,7 @@ int main (int argc, char* argv[]) {
   }
   std::ofstream resultFile("FileOut.txt");
   std::string inputString;
+
   while (std::getline(inputStrings, inputString)) {
     if (inputString.empty()) continue;
     std::vector<Symbol> symbols;
@@ -28,7 +31,10 @@ int main (int argc, char* argv[]) {
     String str(symbols);
     std::ostringstream traceStream;
     bool accepted = machine.compute(str, flag, traceStream);
-    resultFile << inputString << ": " << (accepted ? "ACEPTADA" : "RECHAZADA") << std::endl;
+    resultFile << inputString << ": " << (accepted ? "ACEPTADA" : "RECHAZADA");
+    // Also output how the string ended up on the tape after computation
+    resultFile << " -> Resultado: ";
+    resultFile << str << std::endl;
     if (flag) {
       resultFile << traceStream.str() << std::endl;
     }

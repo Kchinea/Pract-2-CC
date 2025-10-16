@@ -19,6 +19,14 @@ class TuringMachine {
   friend std::ostream& operator<<(std::ostream& os, const TuringMachine& tm);
   bool compute(String& input, bool trace, std::ostream& os) const;
  private:
+  // helper methods to keep compute small
+  int determineTapeCount() const;
+  void initializeTapes(const String& input, int tapeCount, std::vector<std::vector<Symbol>>& tapes, std::vector<int>& heads) const;
+  std::vector<Symbol> readCurrentSymbols(const std::vector<std::vector<Symbol>>& tapes, const std::vector<int>& heads) const;
+  const Transition* findApplicableTransition(const State& currentState, const std::vector<std::vector<Symbol>>& tapes, const std::vector<int>& heads) const;
+  void applyTransition(const Transition& tr, std::vector<std::vector<Symbol>>& tapes, std::vector<int>& heads, State& currentState) const;
+  void flattenResult(String& input, const std::vector<std::vector<Symbol>>& tapes) const;
+ private:
   std::vector<State> states_;
   std::vector<Transition> transitions_;
   Alphabet stringAlphabet_;
