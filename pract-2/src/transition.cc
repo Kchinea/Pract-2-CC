@@ -1,32 +1,7 @@
 #include "transition.h"
 
 /**
- * @brief Constructor con vectores (compatibilidad con parser actual).
- * 
- * Convierte los vectores en la estructura de map unificado interno.
- * 
- * @param from Estado origen.
- * @param to Estado destino.
- * @param readSymbols Vector de símbolos leídos (solo usa el primero).
- * @param writeSymbols Vector de símbolos a escribir.
- * @param movements Vector de movimientos.
- */
-Transition::Transition(const State& from, const State& to, const std::vector<Symbol>& readSymbols,
-                       const std::vector<Symbol>& writeSymbols, const std::vector<Moves>& movements)
-  : from(from), to(to), 
-    readSymbol(readSymbols.empty() ? Symbol('.') : readSymbols[0]) {
-  
-  // Convertir vectores a map unificado: cinta -> (símbolo, movimiento)
-  size_t maxSize = std::max(writeSymbols.size(), movements.size());
-  for (size_t i = 0; i < maxSize; ++i) {
-    Symbol writeSymbol = (i < writeSymbols.size()) ? writeSymbols[i] : Symbol('.');
-    Moves move = (i < movements.size()) ? movements[i] : Moves::STAY;
-    tapeActions.insert(std::make_pair(i, std::make_pair(writeSymbol, move)));
-  }
-}
-
-/**
- * @brief Constructor moderno con map unificado.
+ * @brief Constructor con map unificado.
  * 
  * @param from Estado origen.
  * @param to Estado destino.

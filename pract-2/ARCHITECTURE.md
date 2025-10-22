@@ -24,30 +24,52 @@
 │  (Data/Structure)        │◄──┤  (Behavior/Logic)            │
 ├──────────────────────────┤   ├──────────────────────────────┤
 │ - statesMap_             │   │ - model_: const Model&       │
-│ - transitionsMap_        │   ├──────────────────────────────┤
-│ - stringAlphabet_        │   │ + compute(input, ...): bool  │
-│ - tapeAlphabet_          │   │ - initializeTapes()          │
+│ - transitionsMap_        │   │ - tracePrinter_: TracePrinter│
+│ - stringAlphabet_        │   ├──────────────────────────────┤
+│ - tapeAlphabet_          │   │ + compute(input, ...): bool  │
+│ - initialStateId_        │   │ - initializeTapes()          │
 ├──────────────────────────┤   │ - readCurrentSymbols()       │
 │ + getStateById()         │   │ - findApplicableTransition() │
 │ + getTransitionsFrom()   │   │ - applyTransition()          │
-│ + determineTapeCount()   │   │ - flattenResult()            │
-└──────────────────────────┘   └──────────────────────────────┘
+│ + getInitialState()      │   │ - flattenResult()            │
+│ + determineTapeCount()   │   └──────────┬───────────────────┘
+└──────────────────────────┘              │
+                                          │ has-a
+                                          │ (composición)
+                                          ▼
+                               ┌──────────────────────────┐
+                               │     TracePrinter         │
+                               │   (Presentation)         │
+                               ├──────────────────────────┤
+                               │ + printHeader()          │
+                               │ + printStep()            │
+                               │ + printAcceptedMessage() │
+                               │ + printRejectedMessage() │
+                               │ + printMaxStepsMessage() │
+                               └──────────────────────────┘
 ```
 
 ## Principio de Diseño: Single Responsibility
 
-### Antes (Monolítico)
+### Evolución de la Arquitectura
+
+#### **Versión 1: Monolítico**
 - **TuringMachine**: Mezclaba definición de la MT + lógica de simulación
 - Difícil de testear y extender
 - Alta complejidad
 
-### Después (Separación de Responsabilidades)
+#### **Versión 2: Modelo-Simulador**
+- **TuringMachineModel**: Representa la estructura formal de la MT
+- **TuringMachineSimulator**: Ejecuta la lógica de simulación
+- Mejor pero aún con código de presentación mezclado
 
-#### **TuringMachineModel** (Modelo de Datos)
+#### **Versión 3: Actual (Modelo-Simulador-Presentador)**
+
+**TuringMachineModel** (Modelo de Datos)
 - **Responsabilidad única**: Representar la estructura formal de la MT
-- Almacena: estados, transiciones, alfabetos
+- Almacena: estados, transiciones, alfabetos, estado inicial
 - Proporciona acceso eficiente (O(1)) a través de maps
-- **No sabe** cómo se ejecuta una simulación
+- **No sabe** cómo se ejecuta una simulación ni cómo se presenta
 
 #### **TuringMachineSimulator** (Lógica de Simulación)
 - **Responsabilidad única**: Ejecutar la simulación

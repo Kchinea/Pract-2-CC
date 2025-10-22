@@ -8,16 +8,9 @@
  */
 class Args {
 public:
-  std::string mtFile;      ///< Fichero de definición de la Máquina de Turing
-  std::string stringsFile; ///< Fichero de cadenas a procesar
-  bool trace;              ///< Flag para activar el modo traza
-  
-  /**
-   * @brief Constructor de Args.
-   * @param mt Fichero de definición de la MT.
-   * @param strings Fichero de cadenas.
-   * @param traceFlag Flag de traza.
-   */
+  std::string mtFile;
+  std::string stringsFile;
+  bool trace;
   Args(const std::string& mt, const std::string& strings, bool traceFlag)
     : mtFile(mt), stringsFile(strings), trace(traceFlag) {}
 };

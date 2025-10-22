@@ -25,8 +25,7 @@ int main (int argc, char* argv[]) {
   Args args = parse_args(argc, argv);
   FileParser parser;
   TuringMachine machine = parser.parseFile(args.mtFile);
-  // Print the parsed Turing Machine to stdout
-  // std::cout << machine << std::endl;
+  
   std::ifstream inputStrings(args.stringsFile);
   if (!inputStrings.is_open()) {
     std::cerr << "No se pudo abrir el archivo de cadenas: " << args.stringsFile << std::endl;
@@ -41,18 +40,29 @@ int main (int argc, char* argv[]) {
     for (char c : inputString) {
       if (c != ' ' && c != '\n' && c != '\r') symbols.push_back(Symbol(c));
     }
-    String str(symbols);
+    String string(symbols);
     std::ostringstream traceStream;
-    bool accepted = machine.compute(str, args.trace, traceStream);
-    resultFile << inputString << ": " << (accepted ? "ACEPTADA" : "RECHAZADA");
-    // Also output how the string ended up on the tape after computation
-    resultFile << " -> Resultado: ";
-    resultFile << str << std::endl;
     if (args.trace) {
-      resultFile << traceStream.str() << std::endl;
+      std::cout << "\n" << std::string(120, '=') << "\n";
+      std::cout << "PROCESANDO CADENA: \"" << inputString << "\"\n";
+      std::cout << std::string(120, '=') << "\n";
+    }
+    bool accepted = machine.compute( string, args.trace, traceStream);
+    resultFile << inputString << ": " << (accepted ? "ACEPTADA" : "RECHAZADA");
+    resultFile << " -> Resultado: ";
+    resultFile << string << std::endl;
+    if (args.trace) {
+      std::cout << traceStream.str();
+      std::cout << "\n" << std::string(120, '=') << "\n";
+      std::cout << "RESULTADO FINAL: " << inputString << " -> " << (accepted ? "✓ ACEPTADA" : "✗ RECHAZADA") << "\n";
+      std::cout << "Cinta resultante: " << string << "\n";
+      std::cout << std::string(120, '=') << "\n\n";
     }
   }
   inputStrings.close();
   resultFile.close();
+  if (!args.trace) {
+    std::cout << "Resultados guardados en FileOut.txt\n";
+  }
   return 0;
 }

@@ -1,4 +1,5 @@
 #include "file_parser.h"
+#include <stdexcept>
 
 /**
  * @brief Constructor por defecto de FileParser.
@@ -134,8 +135,8 @@ std::vector<State> FileParser::buildStates(const std::vector<std::string>& state
  * 
  * Para cada línea de transición extrae el estado origen, símbolo de lectura,
  * estado destino, y luego lee pares (símbolo_escritura movimiento) para
- * construir los vectores de writeSymbols y movements. Soporta transiciones
- * multicinta leyendo múltiples pares de escritura-movimiento.
+ * construir el map de acciones por cinta. Soporta transiciones multicinta
+ * leyendo múltiples pares de escritura-movimiento.
  * 
  * @param transitions Vector de strings con las líneas de transiciones.
  * @return Vector de objetos Transition construidos.
@@ -148,22 +149,23 @@ std::vector<Transition> FileParser::parseTransitionLines(const std::vector<std::
 		ss >> fromState >> readSymStr >> toState;
 		State from(fromState);
 		State to(toState);
-
-		std::vector<Symbol> readVec;
-		if (!readSymStr.empty()) readVec.push_back(Symbol(readSymStr[0]));
-		std::vector<Symbol> writeVec;
-		std::vector<Moves> movesVec;
+		Symbol readSymbol = (!readSymStr.empty()) ? Symbol(readSymStr[0]) : Symbol('.');
+		std::map<int, std::pair<Symbol, Moves>> tapeActions;
 		std::string writeSymStr, moveStr;
+		int tapeIndex = 0;
 		while (ss >> writeSymStr >> moveStr) {
-			if (!writeSymStr.empty()) writeVec.push_back(Symbol(writeSymStr[0]));
+			Symbol writeSymbol = (!writeSymStr.empty()) ? Symbol(writeSymStr[0]) : Symbol('.');
+			Moves move = Moves::STAY;
 			if (!moveStr.empty()) {
 				char m = moveStr[0];
-				if (m == 'L') movesVec.push_back(Moves::LEFT);
-				else if (m == 'R') movesVec.push_back(Moves::RIGHT);
-				else movesVec.push_back(Moves::STAY);
+				if (m == 'L') move = Moves::LEFT;
+				else if (m == 'R') move = Moves::RIGHT;
+				else move = Moves::STAY;
 			}
+			tapeActions.insert(std::make_pair(tapeIndex, std::make_pair(writeSymbol, move)));
+			tapeIndex++;
 		}
-		Transition transition(from, to, readVec, writeVec, movesVec);
+		Transition transition(from, to, readSymbol, tapeActions);
 		transitionObjects.push_back(transition);
 	}
 	return transitionObjects;
@@ -183,25 +185,17 @@ std::vector<Transition> FileParser::parseTransitionLines(const std::vector<std::
 TuringMachine FileParser::parseFile(const std::string& filename) {
 	std::ifstream infile(filename);
 	if (!infile.is_open()) {
-		std::cerr << "No se pudo abrir el archivo: " << filename << std::endl;
-		return TuringMachine();
+		throw std::runtime_error("No se pudo abrir el archivo: " + filename);
 	}
-
 	std::vector<std::string> states, inputAlphabet, tapeAlphabet, transitions, acceptStates;
 	std::string initialState, initialStackSymbol;
-
 	readAndSplitSections(infile, states, inputAlphabet, tapeAlphabet, initialState, initialStackSymbol, acceptStates, transitions);
 	infile.close();
-
 	Alphabet inputAlpha = buildAlphabet(inputAlphabet);
 	Alphabet tapeAlpha = buildAlphabet(tapeAlphabet);
-
 	std::vector<State> stateObjects = buildStates(states, acceptStates);
-	// initial state object can be used if needed
 	State initialStateObj(initialState);
-
 	std::vector<Transition> transitionObjects = parseTransitionLines(transitions);
-
-	TuringMachine machine(stateObjects, transitionObjects, inputAlpha, tapeAlpha);
+	TuringMachine machine(stateObjects, transitionObjects, inputAlpha, tapeAlpha, initialState);
 	return machine;
 }

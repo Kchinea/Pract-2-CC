@@ -16,15 +16,8 @@
  */
 class Transition {
   public:
-    // Constructor con vectores (compatibilidad con parser actual)
-    Transition(const State& from, const State& to, const std::vector<Symbol>& readSymbols, 
-               const std::vector<Symbol>& writeSymbols, const std::vector<Moves>& movements);
-
-    // Constructor moderno con map unificado
     Transition(const State& from, const State& to, const Symbol& readSymbol,
                const std::map<int, std::pair<Symbol, Moves>>& tapeActions);
-
-    // Getters
     const State& getFrom() const { return from; }
     const State& getTo() const { return to; }
     const Symbol& getReadSymbol() const { return readSymbol; }
@@ -35,10 +28,8 @@ class Transition {
   private:
     State from;
     State to;
-    
-    // Estructura optimizada
-    Symbol readSymbol;  // Solo se lee de cinta 0
-    std::map<int, std::pair<Symbol, Moves>> tapeActions;  // cinta -> (símbolo_a_escribir, movimiento)
+    Symbol readSymbol;
+    std::map<int, std::pair<Symbol, Moves>> tapeActions;
 };
 
 #endif

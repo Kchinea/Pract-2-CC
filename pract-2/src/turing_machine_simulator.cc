@@ -1,5 +1,10 @@
 #include "turing_machine_simulator.h"
-#include <iostream>
+#include <stdexcept>
+
+// Inicializar transición estática vacía
+const Transition TuringMachineSimulator::emptyTransition_(
+  State(""), State(""), Symbol('.'), std::map<int, std::pair<Symbol, Moves>>()
+);
 
 /**
  * @brief Constructor del simulador.
@@ -28,45 +33,39 @@ bool TuringMachineSimulator::compute(String& input, bool trace, std::ostream& os
   std::vector<std::vector<Symbol>> tapes;
   std::vector<int> heads;
   initializeTapes(input, tapeCount, tapes, heads);
-
   State currentState;
-  // Get first state from model
-  const auto& statesMap = model_.getStates();
-  if (!statesMap.empty()) currentState = statesMap.begin()->second;
-
+  try {
+    currentState = model_.getInitialState();
+  } catch (const std::exception& e) {
+    throw std::runtime_error("No se pudo obtener el estado inicial de la máquina: " + std::string(e.what()));
+  }
   bool accepted = false;
   int steps = 0;
   const int MAX_STEPS = 100000;
-
+  if (trace) tracePrinter_.printHeader(os);
   while (true) {
-    if (trace) {
-      os << "Paso " << steps << ": Estado=" << currentState << ", Cintas:\n";
-      for (int t = 0; t < tapeCount; ++t) {
-        os << "  cinta" << t << ": ";
-        for (size_t i = 0; i < tapes[t].size(); ++i) {
-          if ((int)i == heads[t]) os << '[';
-          os << tapes[t][i];
-          if ((int)i == heads[t]) os << ']';
-        }
-        os << "\n";
-      }
-    }
-
-    // If current state is accepting, halt and accept
     if (currentState.isAccept()) {
       accepted = true;
+      if (trace) tracePrinter_.printAcceptedMessage(os);
       break;
     }
-
-    // Read current symbols and find/apply an applicable transition
     auto currentRead = readCurrentSymbols(tapes, heads);
-    const Transition* tr = findApplicableTransition(currentState, tapes, heads);
-    if (!tr) break; // no transition
-    applyTransition(*tr, tapes, heads, currentState);
+    bool foundTransition = false;
+    const Transition& tr = findApplicableTransition(currentState, tapes, heads, foundTransition);
+    if (trace) {
+      tracePrinter_.printStep(os, steps, currentState, currentRead, tr, foundTransition, tapes, heads, tapeCount);
+    }
+    if (!foundTransition) {
+      if (trace) tracePrinter_.printRejectedMessage(os);
+      break;
+    }
+    applyTransition(tr, tapes, heads, currentState);
     steps++;
-    if (steps > MAX_STEPS) break;
+    if (steps > MAX_STEPS) {
+      if (trace) tracePrinter_.printMaxStepsMessage(os);
+      break;
+    }
   }
-
   flattenResult(input, tapes);
   return accepted;
 }
@@ -110,7 +109,9 @@ std::vector<Symbol> TuringMachineSimulator::readCurrentSymbols(
   std::vector<Symbol> currentRead(tapeCount, Symbol('.'));
   for (int t = 0; t < tapeCount; ++t) {
     int h = heads[t];
-    if (h >= 0 && h < (int)tapes[t].size()) currentRead[t] = tapes[t][h];
+    if (h >= 0 && h < (int)tapes[t].size()){
+      currentRead[t] = tapes[t][h];
+    }
   }
   return currentRead;
 }
@@ -125,29 +126,27 @@ std::vector<Symbol> TuringMachineSimulator::readCurrentSymbols(
  * @param currentState Estado actual de la máquina.
  * @param tapes Vector de cintas.
  * @param heads Vector de posiciones de cabezas.
- * @return Puntero a la transición aplicable, o nullptr si no hay ninguna.
+ * @param found Referencia bool que se establece a true si se encuentra una transición.
+ * @return Referencia a la transición encontrada, o a emptyTransition_ si no se encuentra.
  */
-const Transition* TuringMachineSimulator::findApplicableTransition(
+const Transition& TuringMachineSimulator::findApplicableTransition(
     const State& currentState, 
     const std::vector<std::vector<Symbol>>& tapes, 
-    const std::vector<int>& heads) const {
-  
-  // Leer símbolo de cinta 0
+    const std::vector<int>& heads,
+    bool& found) const {
   Symbol currentSymbol = Symbol('.');
   if (!tapes.empty() && !tapes[0].empty() && heads[0] >= 0 && heads[0] < (int)tapes[0].size()) {
     currentSymbol = tapes[0][heads[0]];
   }
-  
-  // O(1) lookup in model's transition map by state id
   const auto& transitions = model_.getTransitionsFrom(currentState.getId());
-  
-  // Buscar transición que coincida con el símbolo leído
-  for (const auto& tr : transitions) {
-    if (tr.getReadSymbol().getValue() == currentSymbol.getValue()) {
-      return &tr;
+  for (const auto& transition : transitions) {
+    if (transition.getReadSymbol().getValue() == currentSymbol.getValue()) {
+      found = true;
+      return transition;
     }
   }
-  return nullptr;
+  found = false;
+  return emptyTransition_;
 }
 
 /**
@@ -168,22 +167,13 @@ void TuringMachineSimulator::applyTransition(const Transition& tr,
                                              std::vector<int>& heads, 
                                              State& currentState) const {
   int tapeCount = tapes.size();
-  
-  // Usar el nuevo map unificado tapeActions
-  const auto& actions = tr.getTapeActions();
-  
-  // Aplicar acciones (escribir y mover) por cada cinta definida
+  const std::map<int, std::pair<Symbol, Moves>>& actions = tr.getTapeActions();
   for (const auto& pair : actions) {
     int tapeIndex = pair.first;
     const Symbol& writeSymbol = pair.second.first;
     Moves move = pair.second.second;
-    
-    // Asegurar que el índice de cinta es válido
     if (tapeIndex >= 0 && tapeIndex < tapeCount) {
-      // Escribir símbolo
       tapes[tapeIndex][heads[tapeIndex]] = writeSymbol;
-      
-      // Mover cabeza
       if (move == Moves::LEFT) {
         if (heads[tapeIndex] == 0) {
           tapes[tapeIndex].insert(tapes[tapeIndex].begin(), Symbol('.'));
@@ -199,12 +189,11 @@ void TuringMachineSimulator::applyTransition(const Transition& tr,
       // Si es STAY, no hacer nada
     }
   }
-  
-  // O(1) lookup in model's state map instead of O(n) linear search
   const std::string& toId = tr.getTo().getId();
-  const State* nextState = model_.getStateById(toId);
-  if (nextState) {
-    currentState = *nextState;
+  try {
+    currentState = model_.getStateById(toId);
+  } catch (const std::exception& e) {
+    throw std::runtime_error("Error aplicando transición: estado destino no encontrado: " + toId);
   }
 }
 
@@ -219,6 +208,9 @@ void TuringMachineSimulator::applyTransition(const Transition& tr,
  */
 void TuringMachineSimulator::flattenResult(String& input, 
                                            const std::vector<std::vector<Symbol>>& tapes) const {
-  if (tapes.empty()) { input = String(std::vector<Symbol>()); return; }
+  if (tapes.empty()) { 
+    input = String(std::vector<Symbol>()); 
+    return; 
+  }
   input = String(tapes[0]);
 }

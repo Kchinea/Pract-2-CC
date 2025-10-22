@@ -12,14 +12,12 @@
  * @param transitions Vector de transiciones obtenidas del parser.
  * @param stringAlphabet Alfabeto de entrada de la MT.
  * @param tapeAlphabet Alfabeto de cinta de la MT.
+ * @param initialStateId Identificador del estado inicial.
  */
 TuringMachine::TuringMachine(std::vector<State> states, std::vector<Transition> transitions, 
-                             Alphabet stringAlphabet, Alphabet tapeAlphabet) {
-  // Create model with the parsed data (C++11 compatible)
-  model_.reset(new TuringMachineModel(states, transitions, stringAlphabet, tapeAlphabet));
-  
-  // Create simulator that operates on the model
-  simulator_.reset(new TuringMachineSimulator(*model_));
+                             Alphabet stringAlphabet, Alphabet tapeAlphabet, const std::string& initialStateId) 
+  : model_(states, transitions, stringAlphabet, tapeAlphabet, initialStateId),
+    simulator_(model_) {
 }
 
 /**
@@ -31,25 +29,24 @@ TuringMachine::TuringMachine(std::vector<State> states, std::vector<Transition> 
  * @return true si la cadena es aceptada, false en caso contrario.
  */
 bool TuringMachine::compute(String& input, bool trace, std::ostream& os) const {
-  if (!simulator_) return false;
-  return simulator_->compute(input, trace, os);
+  return simulator_.compute(input, trace, os);
 }
 
 // Getters que delegan al modelo
 const std::unordered_map<std::string, State>& TuringMachine::getStates() const {
-  return model_->getStates();
+  return model_.getStates();
 }
 
 const std::map<std::string, std::vector<Transition>>& TuringMachine::getTransitions() const {
-  return model_->getTransitions();
+  return model_.getTransitions();
 }
 
 const Alphabet& TuringMachine::getStringAlphabet() const {
-  return model_->getStringAlphabet();
+  return model_.getStringAlphabet();
 }
 
 const Alphabet& TuringMachine::getTapeAlphabet() const {
-  return model_->getTapeAlphabet();
+  return model_.getTapeAlphabet();
 }
 
 /**
@@ -60,8 +57,6 @@ const Alphabet& TuringMachine::getTapeAlphabet() const {
  * @return Referencia al stream de salida para permitir encadenamiento.
  */
 std::ostream& operator<<(std::ostream& os, const TuringMachine& tm) {
-  if (tm.model_) {
-    os << *tm.model_;
-  }
+  os << tm.model_;
   return os;
 }

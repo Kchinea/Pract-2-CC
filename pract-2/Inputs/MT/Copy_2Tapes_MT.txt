@@ -1,0 +1,16 @@
+q0 q1 q2 q3 qaccept
+a b
+a b .
+q0
+.
+qaccept
+q0 a q1 a R . R
+q0 b q2 b R . R
+q1 a q1 a R a R
+q1 b q2 b R b R
+q2 a q2 a R a R
+q2 b q2 b R b R
+q2 . q3 . L . L
+q3 a q3 a L a L
+q3 b q3 b L b L
+q3 . qaccept . S . S

@@ -1,0 +1,45 @@
+# Máquina de Turing: Lenguaje a^n b^m donde m > n y n >= 1
+# Acepta cadenas con a's seguidas de b's, donde hay más b's que a's y al menos una a
+# Ejemplos: ab, abb, abbb, aabb, aaabbb, aaaabbbb
+# Rechaza: ε, a, b, aa, bb, ba, aab, aaabbb (igual cantidad), abab
+
+# Estados
+q0 q1 q2 q3 q4 qaccept
+
+# Alfabeto de entrada
+a b
+
+# Alfabeto de cinta (incluye símbolos marcados X e Y, y blanco .)
+a b X Y .
+
+# Estado inicial
+q0
+
+# Símbolo blanco
+.
+
+# Estados de aceptación
+qaccept
+
+# Transiciones
+# Estrategia: Por cada 'a' marcar una 'b' con 'Y', al final debe quedar al menos una 'b' sin marcar
+
+# q0: Buscar 'a' no marcada
+q0 a q1 X R
+q0 X q0 X R
+q0 Y q3 Y R
+
+# q1: Avanzar hasta encontrar 'b' no marcada
+q1 a q1 a R
+q1 Y q1 Y R
+q1 b q2 Y L
+
+# q2: Regresar al inicio
+q2 a q2 a L
+q2 Y q2 Y L
+q2 X q2 X L
+q2 . q0 . R
+
+# q3: Verificar que quede al menos una 'b' sin marcar
+q3 Y q3 Y R
+q3 b qaccept b S

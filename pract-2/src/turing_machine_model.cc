@@ -1,5 +1,6 @@
 #include "turing_machine_model.h"
 #include <iostream>
+#include <stdexcept>
 
 // Inicializar vector estático vacío para transiciones
 const std::vector<Transition> TuringMachineModel::emptyTransitions_;
@@ -15,33 +16,42 @@ const std::vector<Transition> TuringMachineModel::emptyTransitions_;
  * @param transitions Vector de transiciones obtenidas del parser.
  * @param stringAlphabet Alfabeto de entrada de la MT.
  * @param tapeAlphabet Alfabeto de cinta de la MT.
+ * @param initialStateId Identificador del estado inicial.
  */
 TuringMachineModel::TuringMachineModel(std::vector<State> states, std::vector<Transition> transitions, 
-                                       Alphabet stringAlphabet, Alphabet tapeAlphabet)
-  : stringAlphabet_(stringAlphabet), tapeAlphabet_(tapeAlphabet) {
-  // Build states map for O(1) access
+                                       Alphabet stringAlphabet, Alphabet tapeAlphabet, const std::string& initialStateId)
+  : stringAlphabet_(stringAlphabet), tapeAlphabet_(tapeAlphabet), initialStateId_(initialStateId) {
   for (const auto& state : states) {
     statesMap_[state.getId()] = state;
   }
-  
-  // Build transitions map indexed by source state for faster lookup
   for (const auto& transition : transitions) {
     transitionsMap_[transition.getFrom().getId()].push_back(transition);
   }
 }
 
 /**
+ * @brief Obtiene el estado inicial de la máquina.
+ * 
+ * @return Referencia al estado inicial.
+ * @throws std::runtime_error si el estado inicial no existe.
+ */
+const State& TuringMachineModel::getInitialState() const {
+  return getStateById(initialStateId_);
+}
+
+/**
  * @brief Busca un estado por su identificador.
  * 
  * @param id Identificador del estado.
- * @return Puntero al estado si existe, nullptr en caso contrario.
+ * @return Referencia al estado.
+ * @throws std::runtime_error si el estado no existe.
  */
-const State* TuringMachineModel::getStateById(const std::string& id) const {
+const State& TuringMachineModel::getStateById(const std::string& id) const {
   auto it = statesMap_.find(id);
   if (it != statesMap_.end()) {
-    return &(it->second);
+    return it->second;
   }
-  return nullptr;
+  throw std::runtime_error("Estado no encontrado: " + id);
 }
 
 /**
@@ -69,9 +79,8 @@ const std::vector<Transition>& TuringMachineModel::getTransitionsFrom(const std:
 int TuringMachineModel::determineTapeCount() const {
   int tapeCount = 1;
   for (const auto& statePair : transitionsMap_) {
-    for (const auto& tr : statePair.second) {
-      // Buscar el índice de cinta más alto en tapeActions
-      const auto& actions = tr.getTapeActions();
+    for (const auto& transition : statePair.second) {
+      const auto& actions = transition.getTapeActions();
       for (const auto& actionPair : actions) {
         tapeCount = std::max(tapeCount, actionPair.first + 1);
       }
@@ -96,14 +105,14 @@ std::ostream& operator<<(std::ostream& os, const TuringMachineModel& model) {
     const State& state = statePair.second;
     os << state;
     if (state.isAccept()) os << " (accept)";
-    os << "\n";
+    os << std::endl;
   }
-  os << "String Alphabet: " << model.stringAlphabet_ << "\n";
-  os << "Tape Alphabet: " << model.tapeAlphabet_ << "\n";
-  os << "Transitions:\n";
+  os << "String Alphabet: " << model.stringAlphabet_ << std::endl;
+  os << "Tape Alphabet: " << model.tapeAlphabet_ << std::endl;
+  os << "Transitions:" << std::endl;
   for (const auto& transPair : model.transitionsMap_) {
     for (const auto& transition : transPair.second) {
-      os << transition << "\n";
+      os << transition << std::endl;
     }
   }
   return os;

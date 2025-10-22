@@ -1,16 +1,12 @@
-10: ACEPTADA -> Resultado: 10
-Paso 0: Estado=q2, Cintas:
-  cinta0: [1]0
-
-1100: ACEPTADA -> Resultado: 1100
-Paso 0: Estado=q2, Cintas:
-  cinta0: [1]100
-
-11000: ACEPTADA -> Resultado: 11000
-Paso 0: Estado=q2, Cintas:
-  cinta0: [1]1000
-
-1: ACEPTADA -> Resultado: 1
-Paso 0: Estado=q2, Cintas:
-  cinta0: [1]
-
+a: RECHAZADA -> Resultado: a.
+aa: RECHAZADA -> Resultado: aa.
+ab: ACEPTADA -> Resultado: .ab.
+aaa: RECHAZADA -> Resultado: aaa.
+abb: ACEPTADA -> Resultado: .abb.
+aabb: ACEPTADA -> Resultado: .aabb.
+aaabbb: ACEPTADA -> Resultado: .aaabbb.
+abab: ACEPTADA -> Resultado: .abab.
+ba: ACEPTADA -> Resultado: .ba.
+bba: ACEPTADA -> Resultado: .bba.
+aaaa: RECHAZADA -> Resultado: aaaa.
+bbbb: ACEPTADA -> Resultado: .bbbb.
