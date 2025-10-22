@@ -22,13 +22,13 @@
  */
 int main (int argc, char* argv[]) {
   usage(argc, argv);
-  Args args = parse_args(argc, argv);
+  Args args(argc, argv);
   FileParser parser;
-  TuringMachine machine = parser.parseFile(args.mtFile);
+  TuringMachine machine = parser.parseFile(args.getMtFile());
   
-  std::ifstream inputStrings(args.stringsFile);
+  std::ifstream inputStrings(args.getStringsFile());
   if (!inputStrings.is_open()) {
-    std::cerr << "No se pudo abrir el archivo de cadenas: " << args.stringsFile << std::endl;
+    std::cerr << "No se pudo abrir el archivo de cadenas: " << args.getStringsFile() << std::endl;
     return 1;
   }
   std::ofstream resultFile("FileOut.txt");
@@ -42,16 +42,16 @@ int main (int argc, char* argv[]) {
     }
     String string(symbols);
     std::ostringstream traceStream;
-    if (args.trace) {
+    if (args.getTrace()) {
       std::cout << "\n" << std::string(120, '=') << "\n";
       std::cout << "PROCESANDO CADENA: \"" << inputString << "\"\n";
       std::cout << std::string(120, '=') << "\n";
     }
-    bool accepted = machine.compute( string, args.trace, traceStream);
+    bool accepted = machine.compute( string, args.getTrace(), traceStream);
     resultFile << inputString << ": " << (accepted ? "ACEPTADA" : "RECHAZADA");
     resultFile << " -> Resultado: ";
     resultFile << string << std::endl;
-    if (args.trace) {
+    if (args.getTrace()) {
       std::cout << traceStream.str();
       std::cout << "\n" << std::string(120, '=') << "\n";
       std::cout << "RESULTADO FINAL: " << inputString << " -> " << (accepted ? "✓ ACEPTADA" : "✗ RECHAZADA") << "\n";
@@ -61,7 +61,7 @@ int main (int argc, char* argv[]) {
   }
   inputStrings.close();
   resultFile.close();
-  if (!args.trace) {
+  if (!args.getTrace()) {
     std::cout << "Resultados guardados en FileOut.txt\n";
   }
   return 0;

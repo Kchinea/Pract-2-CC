@@ -8,14 +8,16 @@
  */
 class Args {
 public:
-  std::string mtFile;
-  std::string stringsFile;
-  bool trace;
-  Args(const std::string& mt, const std::string& strings, bool traceFlag)
-    : mtFile(mt), stringsFile(strings), trace(traceFlag) {}
+  Args(int argc, char* argv[]);
+  const std::string& getMtFile() const { return mtFile_; }
+  const std::string& getStringsFile() const { return stringsFile_; }
+  bool getTrace() const { return trace_; }
+private:
+  std::string mtFile_;
+  std::string stringsFile_;
+  bool trace_;
 };
 
-Args parse_args(int argc, char* argv[]);
 
 
 #endif

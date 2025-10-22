@@ -1,0 +1,59 @@
+# Máquina de Turing: Contador de 'a's y 'b's en formato unario
+# Sustituye la cadena por: .1^(n_a+1).1^(n_b+1).
+# Donde n_a = número de 'a's, n_b = número de 'b's
+# Ejemplos: 
+#   aabbb → .111.1111. (2 a's → 111, 3 b's → 1111)
+#   b → .1.11. (0 a's → 1, 1 b → 11)
+#   aa → .111.1. (2 a's → 111, 0 b's → 1)
+
+# Estados
+q0 q1 q2 q3 q4 q5 q6 q7 q8 qaccept
+
+# Alfabeto de entrada
+a b
+
+# Alfabeto de cinta
+a b 1 .
+
+# Estado inicial
+q0
+
+# Símbolo blanco
+.
+
+# Estados de aceptación
+qaccept
+
+# q0: Escribir 'las a que hayan
+q0 a q1 a L
+q0 b q3 b L
+
+# q1: el 0 + 1 minimo de a
+q1 . q2 1 R
+
+# q2: Escribir '1' por cada a
+q2 a q2 1 R
+q2 b q7 . R
+q2 . q7 . R
+
+# q7 pasar todas las b
+q7 b q7 b R
+q7 . q8 . R
+
+# q8 otro espacio por la b + 1
+q8 . q8 1 L
+q8 b q3 1 L
+
+# q3:Escribir '1' por cada b
+q3 b q3 1 L
+q3 . qaccept . R
+
+# q4: si no hay a's
+q4 . q5 . L
+
+# q5: Escribir '.' final
+q5 . q6 1 R
+
+# q5: Escribir '.' final
+q6 . q3 . R
+
