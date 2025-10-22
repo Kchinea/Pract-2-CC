@@ -198,17 +198,17 @@ std::vector<Transition> FileParser::parseTransitionLines(const std::vector<std::
 }
 
 /**
- * @brief Parsea un fichero de definición de máquina de Turing y construye el objeto TuringMachine.
+ * @brief Parsea un fichero de definición de máquina de Turing y construye el objeto TuringMachineModel.
  * 
  * Lee el fichero línea por línea, separa las secciones (estados, alfabetos,
  * estado inicial, símbolo blanco, estados de aceptación y transiciones),
  * construye los objetos necesarios (estados, alfabetos, transiciones) y
- * finalmente crea y retorna el objeto TuringMachine.
+ * finalmente crea y retorna el objeto TuringMachineModel.
  * 
  * @param filename Ruta al fichero de definición de la MT.
- * @return Objeto TuringMachine construido a partir del fichero.
+ * @return Objeto TuringMachineModel construido a partir del fichero.
  */
-TuringMachine FileParser::parseFile(const std::string& filename) {
+TuringMachineModel FileParser::parseFile(const std::string& filename) {
 	std::ifstream infile(filename);
 	if (!infile.is_open()) {
 		throw std::runtime_error("No se pudo abrir el archivo: " + filename);
@@ -222,6 +222,6 @@ TuringMachine FileParser::parseFile(const std::string& filename) {
 	std::vector<State> stateObjects = buildStates(states, acceptStates);
 	State initialStateObj(initialState);
 	std::vector<Transition> transitionObjects = parseTransitionLines(transitions);
-	TuringMachine machine(stateObjects, transitionObjects, inputAlpha, tapeAlpha, initialState);
-	return machine;
+	TuringMachineModel model(stateObjects, transitionObjects, inputAlpha, tapeAlpha, initialState);
+	return model;
 }

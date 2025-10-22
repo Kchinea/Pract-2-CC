@@ -1,0 +1,13 @@
+aa: ACEPTADA -> Resultado: aa.
+aaaa: ACEPTADA -> Resultado: aaaa.
+aaaaaa: ACEPTADA -> Resultado: aaaaaa.
+bb: ACEPTADA -> Resultado: bb.
+aabb: ACEPTADA -> Resultado: aabb.
+bbaa: ACEPTADA -> Resultado: bbaa.
+abab: ACEPTADA -> Resultado: abab.
+baba: ACEPTADA -> Resultado: baba.
+a: RECHAZADA -> Resultado: a.
+aaa: RECHAZADA -> Resultado: aaa.
+aaaaa: RECHAZADA -> Resultado: aaaaa.
+ababab: RECHAZADA -> Resultado: ababab.
+bbbaaabbb: RECHAZADA -> Resultado: bbbaaabbb.

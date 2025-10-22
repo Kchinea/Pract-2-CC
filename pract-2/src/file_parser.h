@@ -8,7 +8,7 @@
 #include "string.h"
 #include "symbol.h"
 #include "transition.h"
-#include "turing_machine.h"
+#include "turing_machine_model.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -32,7 +32,7 @@ public:
 	Alphabet buildAlphabet(const std::vector<std::string>& symbols);	
 	std::vector<State> buildStates(const std::vector<std::string>& stateNames, const std::vector<std::string>& acceptStates);
 	std::vector<Transition> parseTransitionLines(const std::vector<std::string>& transitions);
-	TuringMachine parseFile(const std::string& filename);
+	TuringMachineModel parseFile(const std::string& filename);
 
 };
 

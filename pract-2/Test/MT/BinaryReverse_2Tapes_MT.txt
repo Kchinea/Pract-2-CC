@@ -1,0 +1,14 @@
+q0 q1 qaccept
+0 1
+0 1 .
+q0
+.
+qaccept
+
+q0 0 q0 . R . 0 R
+q0 1 q0 . R . 1 R
+q0 . q1 . L . . L
+q1 . q1 0 R 0 . L
+q1 . q1 1 R 1 . L
+q1 . qaccept . S . . S
+

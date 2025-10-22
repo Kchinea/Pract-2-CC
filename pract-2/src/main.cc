@@ -2,19 +2,22 @@
 #include "usage.h"
 #include "arg_parser.h"
 #include "file_parser.h"
-#include "turing_machine.h"
+#include "turing_machine_model.h"
+#include "turing_machine_simulator.h"
 
 /**
  * @brief Punto de entrada principal del simulador de Máquinas de Turing multicinta.
  * 
  * Flujo de ejecución:
  * 1. Valida los argumentos de línea de comandos
- * 2. Parsea los argumentos para obtener ficheros de entrada/salida y flag de traza
- * 3. Lee y construye la definición de la Máquina de Turing desde el fichero de entrada
- * 4. Lee cada cadena del fichero de cadenas
- * 5. Simula cada cadena en la MT, determinando si es aceptada o rechazada
- * 6. Escribe los resultados en FileOut.txt, incluyendo el estado final de la cinta 0
- * 7. Si el flag de traza está activo, incluye la traza completa de ejecución
+ * 2. Parsea los argumentos para obtener ficheros de entrada/salida y flags
+ * 3. Lee y construye el modelo de la Máquina de Turing desde el fichero de entrada
+ * 4. Crea el simulador basado en el modelo
+ * 5. Si se solicita --info, muestra la información de la MT
+ * 6. Lee cada cadena del fichero de cadenas
+ * 7. Simula cada cadena en la MT, determinando si es aceptada o rechazada
+ * 8. Escribe los resultados en FileOut.txt, incluyendo el estado final de la cinta 0
+ * 9. Si el flag de traza está activo, incluye la traza completa de ejecución
  * 
  * @param argc Número de argumentos de línea de comandos
  * @param argv Array de argumentos de línea de comandos
@@ -24,14 +27,17 @@ int main (int argc, char* argv[]) {
   usage(argc, argv);
   Args args(argc, argv);
   FileParser parser;
-  TuringMachine machine = parser.parseFile(args.getMtFile());
+  TuringMachineModel model = parser.parseFile(args.getMtFile());
+  TuringMachineSimulator simulator(model);
+  
   if (args.getInfo()) {
     std::cout << "\n" << std::string(120, '=') << "\n";
     std::cout << "INFORMACIÓN DE LA MÁQUINA DE TURING\n";
     std::cout << std::string(120, '=') << "\n";
-    std::cout << machine << "\n";
+    std::cout << model << "\n";
     std::cout << std::string(120, '=') << "\n\n";
   }
+  
   std::ifstream inputStrings(args.getStringsFile());
   if (!inputStrings.is_open()) {
     std::cerr << "No se pudo abrir el archivo de cadenas: " << args.getStringsFile() << std::endl;
@@ -53,7 +59,7 @@ int main (int argc, char* argv[]) {
       std::cout << "PROCESANDO CADENA: \"" << inputString << "\"\n";
       std::cout << std::string(120, '=') << "\n";
     }
-    bool accepted = machine.compute( string, args.getTrace(), traceStream);
+    bool accepted = simulator.compute(string, args.getTrace(), traceStream);
     resultFile << inputString << ": " << (accepted ? "ACEPTADA" : "RECHAZADA");
     resultFile << " -> Resultado: ";
     resultFile << string << std::endl;

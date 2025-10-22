@@ -139,8 +139,6 @@ const Transition& TuringMachineSimulator::findApplicableTransition(
   const auto& transitions = model_.getTransitionsFrom(currentState.getId());
   for (const auto& transition : transitions) {
     const auto& readSyms = transition.getReadSymbols();
-    
-    // Verificar que todos los símbolos coincidan
     bool match = true;
     size_t numTapes = std::min(currentSymbols.size(), readSyms.size());
     for (size_t i = 0; i < numTapes; ++i) {

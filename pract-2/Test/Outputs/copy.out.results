@@ -1,0 +1,12 @@
+a: ACEPTADA -> Resultado: .a.
+aa: ACEPTADA -> Resultado: .aa.
+ab: ACEPTADA -> Resultado: .ab.
+aaa: ACEPTADA -> Resultado: .aaa.
+abb: ACEPTADA -> Resultado: .abb.
+aabb: ACEPTADA -> Resultado: .aabb.
+aaabbb: ACEPTADA -> Resultado: .aaabbb.
+abab: ACEPTADA -> Resultado: .abab.
+ba: ACEPTADA -> Resultado: .ba.
+bba: ACEPTADA -> Resultado: .bba.
+aaaa: ACEPTADA -> Resultado: .aaaa.
+bbbb: ACEPTADA -> Resultado: .bbbb.

@@ -1,0 +1,16 @@
+0: ACEPTADA -> Resultado: 0..
+1: RECHAZADA -> Resultado: 1.
+10: ACEPTADA -> Resultado: 10..
+11: RECHAZADA -> Resultado: 11.
+101: ACEPTADA -> Resultado: 101..
+110: ACEPTADA -> Resultado: 110..
+1010: RECHAZADA -> Resultado: 1010.
+1111: RECHAZADA -> Resultado: 1111.
+0000: RECHAZADA -> Resultado: 0000.
+10101: RECHAZADA -> Resultado: 10101.
+11111: RECHAZADA -> Resultado: 11111.
+00000: ACEPTADA -> Resultado: 00000..
+101010: ACEPTADA -> Resultado: 101010..
+110: ACEPTADA -> Resultado: 110..
+01: ACEPTADA -> Resultado: 01..
+.: RECHAZADA -> Resultado: .
