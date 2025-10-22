@@ -3,7 +3,7 @@
 
 // Inicializar transición estática vacía
 const Transition TuringMachineSimulator::emptyTransition_(
-  State(""), State(""), Symbol('.'), std::map<int, std::pair<Symbol, Moves>>()
+  State(""), State(""), std::vector<Symbol>(), std::map<int, std::pair<Symbol, Moves>>()
 );
 
 /**
@@ -41,7 +41,7 @@ bool TuringMachineSimulator::compute(String& input, bool trace, std::ostream& os
   }
   bool accepted = false;
   int steps = 0;
-  const int MAX_STEPS = 100000;
+  const int MAX_STEPS = 50;
   if (trace) tracePrinter_.printHeader(os);
   while (true) {
     if (currentState.isAccept()) {
@@ -120,8 +120,8 @@ std::vector<Symbol> TuringMachineSimulator::readCurrentSymbols(
  * @brief Busca una transición aplicable al estado actual y símbolos leídos.
  * 
  * Usa el map de transiciones del modelo para buscar directamente las transiciones 
- * que parten del estado actual (O(1) en lugar de O(n)). Solo compara el símbolo
- * leído de la cinta 0 con readSymbol de cada transición.
+ * que parten del estado actual (O(1) en lugar de O(n)). Compara los símbolos
+ * leídos de TODAS las cintas con readSymbols de cada transición.
  * 
  * @param currentState Estado actual de la máquina.
  * @param tapes Vector de cintas.
@@ -134,13 +134,23 @@ const Transition& TuringMachineSimulator::findApplicableTransition(
     const std::vector<std::vector<Symbol>>& tapes, 
     const std::vector<int>& heads,
     bool& found) const {
-  Symbol currentSymbol = Symbol('.');
-  if (!tapes.empty() && !tapes[0].empty() && heads[0] >= 0 && heads[0] < (int)tapes[0].size()) {
-    currentSymbol = tapes[0][heads[0]];
-  }
+  std::vector<Symbol> currentSymbols = readCurrentSymbols(tapes, heads);
+  
   const auto& transitions = model_.getTransitionsFrom(currentState.getId());
   for (const auto& transition : transitions) {
-    if (transition.getReadSymbol().getValue() == currentSymbol.getValue()) {
+    const auto& readSyms = transition.getReadSymbols();
+    
+    // Verificar que todos los símbolos coincidan
+    bool match = true;
+    size_t numTapes = std::min(currentSymbols.size(), readSyms.size());
+    for (size_t i = 0; i < numTapes; ++i) {
+      if (readSyms[i].getValue() != currentSymbols[i].getValue()) {
+        match = false;
+        break;
+      }
+    }
+    
+    if (match) {
       found = true;
       return transition;
     }

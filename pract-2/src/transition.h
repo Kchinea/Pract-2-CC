@@ -11,16 +11,16 @@
  * @brief Representa una transición de una Máquina de Turing multicinta.
  * 
  * Estructura optimizada usando map para acciones por cinta:
- * - Lee un símbolo de la cinta 0 (readSymbol)
+ * - Lee símbolos de todas las cintas (readSymbols)
  * - Para cada cinta: escribe símbolo y mueve cabeza (tapeActions)
  */
 class Transition {
   public:
-    Transition(const State& from, const State& to, const Symbol& readSymbol,
+    Transition(const State& from, const State& to, const std::vector<Symbol>& readSymbols,
                const std::map<int, std::pair<Symbol, Moves>>& tapeActions);
     const State& getFrom() const { return from; }
     const State& getTo() const { return to; }
-    const Symbol& getReadSymbol() const { return readSymbol; }
+    const std::vector<Symbol>& getReadSymbols() const { return readSymbols; }
     const std::map<int, std::pair<Symbol, Moves>>& getTapeActions() const { return tapeActions; }
     
     friend std::ostream& operator<<(std::ostream& os, const Transition& t);
@@ -28,7 +28,7 @@ class Transition {
   private:
     State from;
     State to;
-    Symbol readSymbol;
+    std::vector<Symbol> readSymbols;
     std::map<int, std::pair<Symbol, Moves>> tapeActions;
 };
 

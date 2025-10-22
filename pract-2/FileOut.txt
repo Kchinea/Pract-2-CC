@@ -1,8 +1,1 @@
-aabbb: ACEPTADA -> Resultado: 111.1111
-b: ACEPTADA -> Resultado: .b
-aa: RECHAZADA -> Resultado: 111111
-a: RECHAZADA -> Resultado: 11111
-ab: RECHAZADA -> Resultado: 11111
-aaaa: RECHAZADA -> Resultado: 11111111
-bbbb: ACEPTADA -> Resultado: .bbbb
-aaabbb: ACEPTADA -> Resultado: 1111.1111
+ab: ACEPTADA -> Resultado: .11.11

@@ -25,7 +25,13 @@ int main (int argc, char* argv[]) {
   Args args(argc, argv);
   FileParser parser;
   TuringMachine machine = parser.parseFile(args.getMtFile());
-  
+  if (args.getInfo()) {
+    std::cout << "\n" << std::string(120, '=') << "\n";
+    std::cout << "INFORMACIÓN DE LA MÁQUINA DE TURING\n";
+    std::cout << std::string(120, '=') << "\n";
+    std::cout << machine << "\n";
+    std::cout << std::string(120, '=') << "\n\n";
+  }
   std::ifstream inputStrings(args.getStringsFile());
   if (!inputStrings.is_open()) {
     std::cerr << "No se pudo abrir el archivo de cadenas: " << args.getStringsFile() << std::endl;

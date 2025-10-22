@@ -1,0 +1,10 @@
+# Máquina de prueba simple: 2 cintas
+# Lee 'a' de cinta 0, escribe 'X' en cinta 1, acepta
+q0 qaccept
+a b
+a b X .
+q0
+.
+qaccept
+q0 a qaccept a S . X S
+q0 b qaccept b S . X S

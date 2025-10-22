@@ -1,0 +1,63 @@
+# Máquina de Turing 2 cintas: Contador de 'a's y 'b's en formato unario
+# Convierte cadena a: .1^(n_a+1).1^(n_b+1).
+# Estrategia: Usar cinta 1 para contar, copiar a cinta 0
+
+# Estados
+q0 q1 q2 q3 q4 q5 q6 q7 q8 q9 qaccept
+
+# Alfabeto de entrada
+a b
+
+# Alfabeto de cinta
+a b 1 .
+
+# Estado inicial
+q0
+
+# Símbolo blanco
+.
+
+# Estados de aceptación
+qaccept
+
+# Transiciones
+# q0: Copiar a's a cinta 1
+q0 a q1 . R . 1 R . . S
+q0 b q5 b S . 1 R . . S
+
+# q1: Volver al inicio
+q1 a q1 . R . 1 R . . S
+q1 b q2 b S . . S . . S
+q1 . q8 1 L . . S . . S
+
+# q2: Escribir punto inicial en cinta 0
+q2 b q2 . R . . S . 1 R
+q2 . q3 1 L . . S . . L
+
+# q3: Contar a's - escribir 1 por cada 'a' + 1 extra
+q3 . q3 1 L . . S 1 . L
+q3 . q4 . L . . L . . S
+
+
+# q4: Agregar 1 extra para a's
+q4 . q4 1 L 1 . L . . S
+q4 . qaccept 1 L . . L . . L
+
+# q5: Punto separador
+q5 b q5 . R . . S . 1 R
+q5 . q6 1 L . . S . . L
+
+# q6: Contar b's - escribir 1 por cada 'b' + 1 extra
+q6 . q6 1 L . . S 1 . L
+q6 . q7 . L . . L . . S
+
+# q7: Contar b's - escribir 1 por cada 'b' + 1 extra
+q7 . q7 1 L 1 . L . . S
+q7 . qaccept . L . . L . . L
+
+# q8: Contar b's - escribir 1 por cada 'b' + 1 extra
+q8 . q9 . L . . L . . S
+
+# q9: Contar b's - escribir 1 por cada 'b' + 1 extra
+q9 . q9 1 L 1 . L . . S
+q9 . qaccept 1 S . . S . . S

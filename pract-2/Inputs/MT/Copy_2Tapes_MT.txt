@@ -4,13 +4,9 @@ a b .
 q0
 .
 qaccept
-q0 a q1 a R . R
-q0 b q2 b R . R
-q1 a q1 a R a R
-q1 b q2 b R b R
-q2 a q2 a R a R
-q2 b q2 b R b R
-q2 . q3 . L . L
-q3 a q3 a L a L
-q3 b q3 b L b L
-q3 . qaccept . S . S
+q0 a q0 a R . a R
+q0 b q0 b R . b R
+q0 . q1 . L . . L
+q1 a q1 a L a a L
+q1 b q1 b L b b L
+q1 . qaccept . S . . S

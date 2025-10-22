@@ -12,10 +12,12 @@ public:
   const std::string& getMtFile() const { return mtFile_; }
   const std::string& getStringsFile() const { return stringsFile_; }
   bool getTrace() const { return trace_; }
+  bool getInfo() const { return info_; }
 private:
   std::string mtFile_;
   std::string stringsFile_;
   bool trace_;
+  bool info_;
 };
 
 

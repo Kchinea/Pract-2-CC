@@ -253,27 +253,122 @@ q3 b qaccept b S  # ¡'b' extra! → ACEPTA
 
 ---
 
-### Ejercicio 2: [Por completar]
+### Ejercicio 2: Contador de 'a's y 'b's en Formato Unario (3 cintas)
 
-**Objetivo:** [Descripción del segundo ejercicio]
+**Objetivo:** Contar el número de 'a's y 'b's en la cadena de entrada y escribir el resultado en formato unario.
 
 **Descripción:**
-[Explicación detallada del lenguaje a reconocer]
+Dada una cadena de entrada w ∈ {a, b}*, la máquina debe transformarla en:
+```
+.1^(n_a+1).1^(n_b+1).
+```
+donde:
+- n_a = número de 'a's en la cadena
+- n_b = número de 'b's en la cadena
+- Cada grupo de unos representa el conteo + 1 (mínimo)
 
-**Estrategia de la MT:**
-[Pasos del algoritmo]
+**Ejemplos:**
+- `a` → `.11.1.` (1 'a' → 11, 0 'b's → 1)
+- `aa` → `.111.1.` (2 'a's → 111, 0 'b's → 1)
+- `b` → `.1.11.` (0 'a's → 1, 1 'b' → 11)
+- `abb` → `.11.111.` (1 'a' → 11, 2 'b's → 111)
+
+**Estrategia de la MT (3 cintas):**
+
+**Cintas:**
+- **Cinta 0**: Entrada/Salida - se transforma progresivamente
+- **Cinta 1**: Cinta auxiliar para contar (1's temporales)
+- **Cinta 2**: Cinta auxiliar adicional (sin uso activo)
+
+**Fases:**
+
+1. **Fase 1: Contar 'a's**
+   - Recorrer cinta 0 buscando 'a's
+   - Por cada 'a' encontrada: borrarla de cinta 0, escribir '1' en cinta 1
+   - Las 'b's se preservan para la siguiente fase
+
+2. **Fase 2: Escribir resultado de 'a's en cinta 0**
+   - Agregar '1' inicial (mínimo)
+   - Leer '1's de cinta 1 y escribirlos en cinta 0
+   - Escribir punto separador '.'
+
+3. **Fase 3: Contar 'b's**
+   - Recorrer cinta 0 buscando 'b's
+   - Por cada 'b' encontrada: borrarla, escribir '1' en cinta 1
+
+4. **Fase 4: Escribir resultado de 'b's**
+   - Agregar '1' inicial (mínimo)
+   - Copiar '1's de cinta 1 a cinta 0
+   - Finalizar en estado de aceptación
 
 **Diagrama de Estados:**
 ```
-[Por completar - diagrama de estados]
+                    a/.,R
+    ┌────┐       ┌────────┐  a/.,R       ┌────┐
+───►│ q0 │──────►│   q1   │─────────────►│ q1 │ (Contar a's)
+    └──┬─┘       └────┬───┘              └──┬─┘
+       │              │ b                   │ .
+       │ b            ▼                     ▼
+       │          ┌────┐                ┌────┐
+       └─────────►│ q2 │───────────────►│ q3 │ (Escribir resultado a's)
+                  └────┘      .          └──┬─┘
+                                            │
+                                            ▼
+                  ┌────┐                ┌────┐
+                  │ q5 │◄───────────────│ q4 │ (Agregar 1 extra a's)
+                  └──┬─┘                └────┘
+                     │ b/.,R
+                     ▼
+                  ┌────┐                ┌────┐
+                  │ q6 │───────────────►│ q7 │ (Escribir resultado b's)
+                  └────┘      .          └──┬─┘
+                                            │
+                                            ▼
+                                        ┌────────┐
+                                        │qaccept │
+                                        └────────┘
 ```
 
-**Archivo:** `Inputs/MT/[nombre_archivo].txt`
+**Archivo:** `Inputs/MT/CountAB_2Tapes_MT.txt` *(nota: nombre de archivo mantiene "2Tapes" pero usa 3)*
+
+**Formato de transiciones (3 cintas):**
+```
+<estado> <lec0> <sig_estado> <esc0> <mov0> <lec1> <esc1> <mov1> <lec2> <esc2> <mov2>
+```
+
+**Transiciones principales:**
+```
+# Contar a's (borrar de cinta 0, escribir en cinta 1)
+q0 a q1 . R . 1 R . . S    # Lee 'a', borra, escribe '1' en cinta 1
+q1 a q1 . R . 1 R . . S    # Continúa contando 'a's
+
+# Encontrar b o fin de a's
+q1 b q2 b S . . S . . S    # Encontró 'b', preparar fase de escritura
+q1 . q8 1 L . . S . . S    # No hay b's, ir a escribir solo a's
+
+# Escribir resultado de a's
+q3 . q3 1 L . . S 1 . L    # Escribe '1's en cinta 0
+q4 . q4 1 L 1 . L . . S    # Agrega '1' extra para a's
+
+# Contar b's
+q5 b q5 . R . . S . 1 R    # Borra 'b', escribe '1' en cinta 2
+q6 . q6 1 L . . S 1 . L    # Escribe '1's para b's
+
+# Agregar 1 extra para b's
+q7 . q7 1 L 1 . L . . S    # Agrega '1' extra
+q7 . qaccept . L . . L . . L  # Acepta
+```
 
 **Cadenas de prueba:**
 ```bash
-./pract-02 Inputs/MT/[archivo].txt Inputs/Strigs/[strings].txt
+./pract-02 Inputs/MT/CountAB_2Tapes_MT.txt Inputs/Strigs/strings_ab.txt
 ```
+
+**Resultados esperados:**
+- ✅ `a` → `.11.1.` (1 'a', 0 'b's)
+- ✅ `aa` → `.111.1.` (2 'a's, 0 'b's)
+- ✅ `abb` → `.11.111.` (1 'a', 2 'b's)
+- ✅ `b` → `.1.11.` (0 'a's, 1 'b')
 
 ---
 
@@ -355,7 +450,7 @@ q1 . q1 . S      # Blanco en estado impar → Bucle infinito (RECHAZA)
         ┌───────────────┐
         │               │
         │               ▼
-    ┌────┐            ┌────┐   b/b,R   ┌────┐   ./.,S   ┌────────┐
+    ┌────┐            ┌────┐   b/b,R    ┌────┐   ./.,S    ┌────────┐
 ───►│ q0 │            │ q0 │───────────►│ q1 │───────────►│qaccept │
     └──┬─┘            └────┘            └──┬─┘            └────────┘
        │                                   │
