@@ -1,6 +1,16 @@
 
 #include "usage.h"
 
+/**
+ * @brief Valida los argumentos de línea de comandos y muestra ayuda si es necesario.
+ * 
+ * Verifica que se hayan pasado el número correcto de argumentos (2 o 3 además del nombre
+ * del programa). Si se pasa --help como único argumento, muestra el mensaje de ayuda.
+ * Si el número de argumentos es incorrecto, muestra un error y termina el programa.
+ * 
+ * @param argc Número de argumentos de línea de comandos.
+ * @param argv Array de argumentos de línea de comandos.
+ */
 void usage(int argc, char* argv[]) {
   const std::string helpMsg =
     "Uso: " + std::string(argv[0]) + " <arg1> <arg2> <arg3> (opcional) \n"

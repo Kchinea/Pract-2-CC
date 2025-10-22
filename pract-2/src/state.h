@@ -8,7 +8,7 @@ class State {
   public:
   State() : initial_(false), accept_(false), id("") {}
   State(const std::string& id) : initial_(false), accept_(false), id(id) {}
-  std::string getId() const { return id; }
+  const std::string& getId() const { return id; }
   void setAccept(bool accept) { accept_ = accept; }
   bool isAccept() const { return accept_; }
   friend std::ostream& operator<<(std::ostream& os, const State& state);

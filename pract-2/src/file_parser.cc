@@ -1,10 +1,21 @@
 #include "file_parser.h"
 
-
+/**
+ * @brief Constructor por defecto de FileParser.
+ */
 FileParser::FileParser() {}
+
+/**
+ * @brief Destructor de FileParser.
+ */
 FileParser::~FileParser() {}
 
-
+/**
+ * @brief Parsea una línea y extrae todos los tokens separados por espacios.
+ * 
+ * @param line Línea a parsear.
+ * @return Vector de strings con los tokens extraídos.
+ */
 std::vector<std::string> FileParser::parseTokens(const std::string& line) {
 	std::vector<std::string> tokens;
 	std::stringstream ss(line);
@@ -15,6 +26,12 @@ std::vector<std::string> FileParser::parseTokens(const std::string& line) {
 	return tokens;
 }
 
+/**
+ * @brief Elimina espacios en blanco al inicio y final de un string.
+ * 
+ * @param s String a limpiar.
+ * @return String sin espacios al inicio ni al final.
+ */
 std::string FileParser::trim(const std::string& s) {
 	std::string res = s;
 	res.erase(0, res.find_first_not_of(" \t\n\r"));
@@ -22,6 +39,24 @@ std::string FileParser::trim(const std::string& s) {
 	return res;
 }
 
+/**
+ * @brief Lee el archivo de la MT y divide su contenido en secciones.
+ * 
+ * Parsea el fichero línea por línea, ignorando comentarios (líneas con #)
+ * y líneas vacías. Divide el contenido en las secciones correspondientes:
+ * estados, alfabetos, estado inicial, símbolo blanco, estados de aceptación
+ * y transiciones.
+ * 
+ * @param infile Stream de entrada del fichero ya abierto.
+ * @param states Vector donde se guardarán los nombres de los estados.
+ * @param inputAlphabet Vector donde se guardará el alfabeto de entrada.
+ * @param tapeAlphabet Vector donde se guardará el alfabeto de cinta.
+ * @param initialState String donde se guardará el estado inicial.
+ * @param initialStackSymbol String donde se guardará el símbolo blanco.
+ * @param acceptStates Vector donde se guardarán los estados de aceptación.
+ * @param transitions Vector donde se guardarán las líneas de transiciones.
+ * @return true si se leyó correctamente, false en caso contrario.
+ */
 bool FileParser::readAndSplitSections(std::ifstream& infile,
 	std::vector<std::string>& states,
 	std::vector<std::string>& inputAlphabet,
@@ -53,6 +88,15 @@ bool FileParser::readAndSplitSections(std::ifstream& infile,
 	return true;
 }
 
+/**
+ * @brief Construye un objeto Alphabet a partir de un vector de strings.
+ * 
+ * Toma cada string del vector y extrae su primer carácter para añadirlo
+ * al alfabeto.
+ * 
+ * @param symbols Vector de strings con los símbolos.
+ * @return Objeto Alphabet construido.
+ */
 Alphabet FileParser::buildAlphabet(const std::vector<std::string>& symbols) {
 	Alphabet alpha;
 	for (const auto& symbol : symbols) {
@@ -61,6 +105,16 @@ Alphabet FileParser::buildAlphabet(const std::vector<std::string>& symbols) {
 	return alpha;
 }
 
+/**
+ * @brief Construye un vector de objetos State a partir de nombres y estados de aceptación.
+ * 
+ * Crea un objeto State por cada nombre en stateNames y marca como estados de
+ * aceptación aquellos cuyo id coincida con los nombres en acceptStates.
+ * 
+ * @param stateNames Vector con los nombres de todos los estados.
+ * @param acceptStates Vector con los nombres de los estados de aceptación.
+ * @return Vector de objetos State con los flags de aceptación configurados.
+ */
 std::vector<State> FileParser::buildStates(const std::vector<std::string>& stateNames, const std::vector<std::string>& acceptStates) {
 	std::vector<State> stateObjects;
 	for (const auto& stateName : stateNames) {
@@ -75,6 +129,17 @@ std::vector<State> FileParser::buildStates(const std::vector<std::string>& state
 	return stateObjects;
 }
 
+/**
+ * @brief Parsea las líneas de transiciones y construye objetos Transition.
+ * 
+ * Para cada línea de transición extrae el estado origen, símbolo de lectura,
+ * estado destino, y luego lee pares (símbolo_escritura movimiento) para
+ * construir los vectores de writeSymbols y movements. Soporta transiciones
+ * multicinta leyendo múltiples pares de escritura-movimiento.
+ * 
+ * @param transitions Vector de strings con las líneas de transiciones.
+ * @return Vector de objetos Transition construidos.
+ */
 std::vector<Transition> FileParser::parseTransitionLines(const std::vector<std::string>& transitions) {
 	std::vector<Transition> transitionObjects;
 	for (const auto& transLine : transitions) {
@@ -104,6 +169,17 @@ std::vector<Transition> FileParser::parseTransitionLines(const std::vector<std::
 	return transitionObjects;
 }
 
+/**
+ * @brief Parsea un fichero de definición de máquina de Turing y construye el objeto TuringMachine.
+ * 
+ * Lee el fichero línea por línea, separa las secciones (estados, alfabetos,
+ * estado inicial, símbolo blanco, estados de aceptación y transiciones),
+ * construye los objetos necesarios (estados, alfabetos, transiciones) y
+ * finalmente crea y retorna el objeto TuringMachine.
+ * 
+ * @param filename Ruta al fichero de definición de la MT.
+ * @return Objeto TuringMachine construido a partir del fichero.
+ */
 TuringMachine FileParser::parseFile(const std::string& filename) {
 	std::ifstream infile(filename);
 	if (!infile.is_open()) {

@@ -1,44 +1,16 @@
-10: ACEPTADA -> Resultado: 10..
-Paso 0: Estado=q0, Cintas:
+10: ACEPTADA -> Resultado: 10
+Paso 0: Estado=q2, Cintas:
   cinta0: [1]0
-Paso 1: Estado=q0, Cintas:
-  cinta0: 1[0]
-Paso 2: Estado=q1, Cintas:
-  cinta0: 10[.]
-Paso 3: Estado=q2, Cintas:
-  cinta0: 10.[.]
 
-1100: RECHAZADA -> Resultado: 1100.
-Paso 0: Estado=q0, Cintas:
+1100: ACEPTADA -> Resultado: 1100
+Paso 0: Estado=q2, Cintas:
   cinta0: [1]100
-Paso 1: Estado=q0, Cintas:
-  cinta0: 1[1]00
-Paso 2: Estado=q0, Cintas:
-  cinta0: 11[0]0
-Paso 3: Estado=q1, Cintas:
-  cinta0: 110[0]
-Paso 4: Estado=q0, Cintas:
-  cinta0: 1100[.]
 
-11000: ACEPTADA -> Resultado: 11000..
-Paso 0: Estado=q0, Cintas:
+11000: ACEPTADA -> Resultado: 11000
+Paso 0: Estado=q2, Cintas:
   cinta0: [1]1000
-Paso 1: Estado=q0, Cintas:
-  cinta0: 1[1]000
-Paso 2: Estado=q0, Cintas:
-  cinta0: 11[0]00
-Paso 3: Estado=q1, Cintas:
-  cinta0: 110[0]0
-Paso 4: Estado=q0, Cintas:
-  cinta0: 1100[0]
-Paso 5: Estado=q1, Cintas:
-  cinta0: 11000[.]
-Paso 6: Estado=q2, Cintas:
-  cinta0: 11000.[.]
 
-1: RECHAZADA -> Resultado: 1.
-Paso 0: Estado=q0, Cintas:
+1: ACEPTADA -> Resultado: 1
+Paso 0: Estado=q2, Cintas:
   cinta0: [1]
-Paso 1: Estado=q0, Cintas:
-  cinta0: 1[.]
 
