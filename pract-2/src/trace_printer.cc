@@ -35,21 +35,21 @@ void TracePrinter::printStep(std::ostream& os, int step,
                              const std::vector<std::vector<Symbol>>& tapes,
                              const std::vector<int>& heads, int tapeCount) const {
   // Print step header
-  os << "╔═══════════════════════════════════════════════════════════════════════════════════════════════╗\n";
-  os << "║  PASO " << std::setw(3) << std::left << step << std::string(85, ' ') << "║\n";
-  os << "╠═══════════════════════════════════════════════════════════════════════════════════════════════╣\n";
-  os << "║  Estado actual: " << std::setw(73) << std::left << currentState.getId() << "║\n";
-  os << "║  Símbolos leídos: ";
+  os << "+" << std::string(97, '-') << "+\n";
+  os << "|  PASO " << std::setw(3) << std::left << step << std::string(85, ' ') << "|\n";
+  os << "+" << std::string(97, '-') << "+\n";
+  os << "|  Estado actual: " << std::setw(73) << std::left << currentState.getId() << "|\n";
+  os << "|  Simbolos leidos: ";
   std::ostringstream readStr;
   for (int t = 0; t < tapeCount; ++t) {
     if (t > 0) readStr << ", ";
     readStr << "cinta" << t << "=[" << currentRead[t] << "]";
   }
-  os << std::setw(71) << std::left << readStr.str() << "║\n";
+  os << std::setw(71) << std::left << readStr.str() << "|\n";
   if (foundTransition) {
-    os << "║  Transición: " << std::setw(76) << std::left 
-       << (currentState.getId() + " → " + tr.getTo().getId()) << "║\n";
-    os << "║  Acciones:";
+    os << "|  Transicion: " << std::setw(76) << std::left 
+       << (currentState.getId() + " -> " + tr.getTo().getId()) << "|\n";
+    os << "|  Acciones:";
     for (int t = 0; t < tapeCount; ++t) {
       const auto& actions = tr.getTapeActions();
       auto it = actions.find(t);
@@ -57,23 +57,23 @@ void TracePrinter::printStep(std::ostream& os, int step,
         std::ostringstream actionStr;
         actionStr << "    cinta" << t << ": escribir '" << it->second.first << "', mover ";
         switch(it->second.second) {
-          case Moves::LEFT: actionStr << "←(izq)"; break;
-          case Moves::RIGHT: actionStr << "→(der)"; break;
-          case Moves::STAY: actionStr << "•(quieto)"; break;
+          case Moves::LEFT: actionStr << "<-(izq)"; break;
+          case Moves::RIGHT: actionStr << "->(der)"; break;
+          case Moves::STAY: actionStr << ".(quieto)"; break;
         }
         if (t == 0) {
-          os << std::setw(79) << std::left << actionStr.str() << "║\n";
+          os << std::setw(79) << std::left << actionStr.str() << "|\n";
         } else {
-          os << "║              " << std::setw(75) << std::left << actionStr.str() << "║\n";
+          os << "|              " << std::setw(75) << std::left << actionStr.str() << "|\n";
         }
       }
     }
   } else {
-    os << "║  Transición: " << std::setw(76) << std::left 
-       << "NO HAY TRANSICIÓN APLICABLE" << "║\n";
+    os << "|  Transicion: " << std::setw(76) << std::left 
+       << "NO HAY TRANSICION APLICABLE" << "|\n";
   }
-  os << "╠═══════════════════════════════════════════════════════════════════════════════════════════════╣\n";
-  os << "║  Estado de las cintas:";
+  os << "+" << std::string(97, '-') << "+\n";
+  os << "|  Estado de las cintas:";
   for (int t = 0; t < tapeCount; ++t) {
     std::ostringstream tapeStr;
     tapeStr << "    cinta" << t << ": ";
@@ -84,12 +84,12 @@ void TracePrinter::printStep(std::ostream& os, int step,
       tapeStr << ' ';
     }
     if (t == 0) {
-      os << std::setw(67) << std::left << tapeStr.str() << "║\n";
+      os << std::setw(67) << std::left << tapeStr.str() << "|\n";
     } else {
-      os << "║                        " << std::setw(65) << std::left << tapeStr.str() << "║\n";
+      os << "|                        " << std::setw(65) << std::left << tapeStr.str() << "|\n";
     }
   }
-  os << "╚═══════════════════════════════════════════════════════════════════════════════════════════════╝\n\n";
+  os << "+" << std::string(97, '-') << "+\n\n";
 }
 
 /**
@@ -98,9 +98,9 @@ void TracePrinter::printStep(std::ostream& os, int step,
  * @param os Stream de salida donde se imprimirá el mensaje.
  */
 void TracePrinter::printAcceptedMessage(std::ostream& os) const {
-  os << "\n┌─────────────────────────────────────────────────────────────┐\n";
-  os << "│  ✓ ESTADO DE ACEPTACIÓN ALCANZADO - CADENA ACEPTADA         │\n";
-  os << "└─────────────────────────────────────────────────────────────┘\n";
+  os << "\n+" << std::string(61, '-') << "+\n";
+  os << "|  [OK] ESTADO DE ACEPTACION ALCANZADO - CADENA ACEPTADA    |\n";
+  os << "+" << std::string(61, '-') << "+\n";
 }
 
 /**
@@ -109,9 +109,9 @@ void TracePrinter::printAcceptedMessage(std::ostream& os) const {
  * @param os Stream de salida donde se imprimirá el mensaje.
  */
 void TracePrinter::printRejectedMessage(std::ostream& os) const {
-  os << "\n┌─────────────────────────────────────────────────────────────┐\n";
-  os << "│  ✗ NO HAY TRANSICIÓN - CADENA RECHAZADA                     │\n";
-  os << "└─────────────────────────────────────────────────────────────┘\n";
+  os << "\n+" << std::string(61, '-') << "+\n";
+  os << "|  [X] NO HAY TRANSICION - CADENA RECHAZADA                  |\n";
+  os << "+" << std::string(61, '-') << "+\n";
 }
 
 /**
@@ -120,7 +120,7 @@ void TracePrinter::printRejectedMessage(std::ostream& os) const {
  * @param os Stream de salida donde se imprimirá el mensaje.
  */
 void TracePrinter::printMaxStepsMessage(std::ostream& os) const {
-  os << "\n┌─────────────────────────────────────────────────────────────┐\n";
-  os << "│  ⚠ LÍMITE DE PASOS EXCEDIDO - EJECUCIÓN DETENIDA            │\n";
-  os << "└─────────────────────────────────────────────────────────────┘\n";
+  os << "\n+" << std::string(61, '-') << "+\n";
+  os << "|  [!] LIMITE DE PASOS EXCEDIDO - EJECUCION DETENIDA        |\n";
+  os << "+" << std::string(61, '-') << "+\n";
 }
