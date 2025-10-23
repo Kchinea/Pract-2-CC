@@ -1,0 +1,11 @@
+q0 q1 qaccept
+a b
+a b .
+q0
+.
+qaccept
+q0 a q0 a X
+q0 b q1 b X
+q0 . qaccept . X
+q1 b q1 b X
+q1 . qaccept . X

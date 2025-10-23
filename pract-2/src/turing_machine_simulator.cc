@@ -212,8 +212,15 @@ void TuringMachineSimulator::applyTransition(const Transition& transition,
       if (heads[tapeIndex] == (int)tapes[tapeIndex].size()) {
         tapes[tapeIndex].push_back(Symbol('.'));
       }
+    } else if (move == Moves::STAY) {
+      // Si es STAY, no hacer nada
+    } else {
+      throw std::runtime_error(
+        "Error: Movimiento inválido en la transición desde '" + transition.getFrom().getId() + 
+        "' a '" + transition.getTo().getId() + "' en la cinta " + 
+        std::to_string(tapeIndex)
+      );
     }
-    // Si es STAY, no hacer nada
   }
   const std::string& toId = transition.getTo().getId();
   try {

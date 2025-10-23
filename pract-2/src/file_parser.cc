@@ -162,7 +162,10 @@ std::vector<Transition> FileParser::parseTransitionLines(const std::vector<std::
 				char m = moveStr[0];
 				if (m == 'L') move = Moves::LEFT;
 				else if (m == 'R') move = Moves::RIGHT;
-				else move = Moves::STAY;
+				else if (m == 'S') move = Moves::STAY;
+				else { 
+					throw std::range_error("Error: Movimiento inválido '" + moveStr + "' en la transición desde '" + fromState + "' a '" + toState + "'");
+				}
 			}
 			tapeActions.insert(std::make_pair(tapeIndex, std::make_pair(writeSymbol, move)));
 			tapeIndex++;
@@ -176,7 +179,11 @@ std::vector<Transition> FileParser::parseTransitionLines(const std::vector<std::
 				char m = moveStr[0];
 				if (m == 'L') move = Moves::LEFT;
 				else if (m == 'R') move = Moves::RIGHT;
-				else move = Moves::STAY;
+				else if (m == 'S') move = Moves::STAY;
+				else { 
+					throw std::range_error("Error: Movimiento inválido '" + moveStr + "' en la transición desde '" + fromState + "' a '" + toState + "'");
+				}
+			
 			}
 			tapeActions.insert(std::make_pair(tapeIndex, std::make_pair(writeSymbol, move)));
 			tapeIndex++;
@@ -208,7 +215,13 @@ TuringMachineModel FileParser::parseFile(const std::string& filename) {
 	readAndSplitSections(infile, states, inputAlphabet, tapeAlphabet, initialState, initialStackSymbol, acceptStates, transitions);
 	infile.close();
 	Alphabet inputAlpha = buildAlphabet(inputAlphabet);
+	if(inputAlpha.contains(Symbol('.'))) {
+		throw std::runtime_error("Error: El alfabeto de entrada contiene blanco.");
+	}
 	Alphabet tapeAlpha = buildAlphabet(tapeAlphabet);
+	if(!tapeAlpha.contains(Symbol('.'))) {
+		throw std::runtime_error("Error: El alfabeto de cinta no contiene blanco.");
+	}
 	std::vector<State> stateObjects = buildStates(states, acceptStates);
 	State initialStateObj(initialState);
 	std::vector<Transition> transitionObjects = parseTransitionLines(transitions);

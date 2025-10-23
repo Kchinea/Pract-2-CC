@@ -372,66 +372,6 @@ q3 b qaccept b S # Existe 'b' sin marcar → ACEPTAR
 
 ### Ejercicio 2: Contador de a's y b's
 
-#### Primera Solucion primero a's ,despues b's
-
-**Problema**: Diseñar una MT de 3 cintas que cuente 'a's y 'b's y produzca resultado en formato unario: `.1^(n_a+1).1^(n_b+1).`
-
-**Ejemplos**:
-- `a` → `.11.1.` (1 'a' → dos 1's, 0 'b's → un 1)
-- `aa` → `.111.1.` (2 'a's → tres 1's, 0 'b's → un 1)
-- `abb` → `.11.111.` (1 'a' → dos 1's, 2 'b's → tres 1's)
-- `b` → `.1.11.` (0 'a's → un 1, 1 'b' → dos 1's)
-
-**Estrategia de solución**:
-1. **Contar en cinta auxiliar**: Usar cinta 1 como contador temporal
-2. **Copiar a cinta 0**: Transferir resultado en formato unario
-3. **Separador de puntos**: Usar '.' para delimitar contadores
-
-**Algoritmo (3 cintas)**:
-```
-Fase 1: Procesar 'a's (estados q0-q4)
-  - Por cada 'a': escribir '1' en cinta 1
-  - Borrar 'a' de cinta 0
-  - Al terminar 'a's: escribir separador '.'
-
-Fase 2: Copiar contador de 'a's a cinta 0
-  - Copiar de cinta 1 a cinta 0
-  - Añadir un '1' extra (n_a + 1)
-  - Escribir separador '.'
-
-Fase 3: Procesar 'b's (estados q5-q7)
-  - Por cada 'b': escribir '1' en cinta 1
-  - Borrar 'b' de cinta 0
-  - Copiar contador de 'b's a cinta 0
-  - Añadir un '1' extra (n_b + 1)
-  - Escribir '.' final
-
-Caso especial: Solo 'a's sin 'b's (estado q8-q9)
-  - Manejar cadenas tipo "aa" o "a"
-  - Escribir ".1^(n_a+1).1." (contador de b's = 0 + 1)
-```
-
-**Archivo**: `Inputs/MT/CountAB_2Tapes_MT.txt` (usa 3 cintas)
-
-**Transiciones clave**:
-```
-# Contar 'a's
-q0 a q1 . R . 1 R . . S    # Por cada 'a': escribir 1 en cinta1, borrar en cinta0
-
-# Copiar contador de 'a's con +1
-q3 . q3 1 L . . S 1 . L    # Escribir 1's en cinta0 y cinta2
-q4 . q4 1 L 1 . L . . S    # Copiar y agregar +1
-
-# Contar 'b's
-q5 b q5 . R . . S . 1 R    # Por cada 'b': escribir 1 en cinta2
-
-# Copiar contador de 'b's con +1
-q6 . q6 1 L . . S 1 . L    # Escribir 1's en cinta0
-q7 . q7 1 L 1 . L . . S    # Copiar y agregar +1
-```
-
-**Resultado**: Cinta 0 contiene `.1^(n_a+1).1^(n_b+1).` donde n_a y n_b son los conteos.
-
 #### Segunda Solucion da igual el orden de a's y b's
 
 **Problema**: Diseñar una MT de 3 cintas que cuente 'a's y 'b's siendo que las a's y las b's pueden estar intercaladas y produzca resultado en formato unario: `.1^(n_a+1).1^(n_b+1).`

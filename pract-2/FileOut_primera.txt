@@ -1,0 +1,4 @@
+abbb: ACEPTADA -> Resultado: .XYbb
+bb: RECHAZADA -> Resultado: bb
+aabb: RECHAZADA -> Resultado: .XXYY.
+aa: RECHAZADA -> Resultado: Xa.

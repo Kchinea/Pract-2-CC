@@ -1,0 +1,4 @@
+abbb: ACEPTADA -> Resultado: ....11.1111.
+bb: ACEPTADA -> Resultado: ..1.111.
+aabb: ACEPTADA -> Resultado: ....111.111.
+aa: ACEPTADA -> Resultado: ..111.1.
