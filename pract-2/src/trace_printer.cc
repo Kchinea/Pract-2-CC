@@ -38,11 +38,7 @@ void TracePrinter::printStep(std::ostream& os, int step,
   os << "╔═══════════════════════════════════════════════════════════════════════════════════════════════╗\n";
   os << "║  PASO " << std::setw(3) << std::left << step << std::string(85, ' ') << "║\n";
   os << "╠═══════════════════════════════════════════════════════════════════════════════════════════════╣\n";
-  
-  // Current state
   os << "║  Estado actual: " << std::setw(73) << std::left << currentState.getId() << "║\n";
-  
-  // Read symbols
   os << "║  Símbolos leídos: ";
   std::ostringstream readStr;
   for (int t = 0; t < tapeCount; ++t) {
@@ -50,13 +46,9 @@ void TracePrinter::printStep(std::ostream& os, int step,
     readStr << "cinta" << t << "=[" << currentRead[t] << "]";
   }
   os << std::setw(71) << std::left << readStr.str() << "║\n";
-  
-  // Transition info
   if (foundTransition) {
     os << "║  Transición: " << std::setw(76) << std::left 
        << (currentState.getId() + " → " + tr.getTo().getId()) << "║\n";
-    
-    // Actions for each tape
     os << "║  Acciones:";
     for (int t = 0; t < tapeCount; ++t) {
       const auto& actions = tr.getTapeActions();
@@ -80,8 +72,6 @@ void TracePrinter::printStep(std::ostream& os, int step,
     os << "║  Transición: " << std::setw(76) << std::left 
        << "NO HAY TRANSICIÓN APLICABLE" << "║\n";
   }
-  
-  // Tape contents with head position
   os << "╠═══════════════════════════════════════════════════════════════════════════════════════════════╣\n";
   os << "║  Estado de las cintas:";
   for (int t = 0; t < tapeCount; ++t) {

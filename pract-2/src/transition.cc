@@ -27,14 +27,12 @@ Transition::Transition(const State& from, const State& to, const std::vector<Sym
 std::ostream& operator<<(std::ostream& os, const Transition& t){
   os << "Transition(" << t.getFrom() << " -> " << t.getTo() 
      << ", read: [";
-  
   const auto& readSyms = t.getReadSymbols();
   for (size_t i = 0; i < readSyms.size(); ++i) {
     if (i > 0) os << ", ";
     os << readSyms[i];
   }
   os << "], actions: {";
-  
   const auto& actions = t.getTapeActions();
   bool first = true;
   for (const auto& pair : actions) {
@@ -42,7 +40,6 @@ std::ostream& operator<<(std::ostream& os, const Transition& t){
     os << "tape" << pair.first << ":(" << pair.second.first << "," << pair.second.second << ")";
     first = false;
   }
-  
   os << "})";
   return os;
 }

@@ -51,15 +51,15 @@ bool TuringMachineSimulator::compute(String& input, bool trace, std::ostream& os
     }
     auto currentRead = readCurrentSymbols(tapes, heads);
     bool foundTransition = false;
-    const Transition& tr = findApplicableTransition(currentState, tapes, heads, foundTransition);
+    const Transition& transition = findApplicableTransition(currentState, tapes, heads, foundTransition);
     if (trace) {
-      tracePrinter_.printStep(os, steps, currentState, currentRead, tr, foundTransition, tapes, heads, tapeCount);
+      tracePrinter_.printStep(os, steps, currentState, currentRead, transition, foundTransition, tapes, heads, tapeCount);
     }
     if (!foundTransition) {
       if (trace) tracePrinter_.printRejectedMessage(os);
       break;
     }
-    applyTransition(tr, tapes, heads, currentState);
+    applyTransition(transition, tapes, heads, currentState);
     steps++;
     if (steps > MAX_STEPS) {
       if (trace) tracePrinter_.printMaxStepsMessage(os);
@@ -135,19 +135,23 @@ const Transition& TuringMachineSimulator::findApplicableTransition(
     const std::vector<int>& heads,
     bool& found) const {
   std::vector<Symbol> currentSymbols = readCurrentSymbols(tapes, heads);
-  
   const auto& transitions = model_.getTransitionsFrom(currentState.getId());
   for (const auto& transition : transitions) {
     const auto& readSyms = transition.getReadSymbols();
+    if (readSyms.size() != currentSymbols.size()) {
+      throw std::runtime_error(
+        "Error: La transición desde el estado '" + currentState.getId() + 
+        "' tiene " + std::to_string(readSyms.size()) + " símbolos de lectura, " +
+        "pero la máquina tiene " + std::to_string(currentSymbols.size()) + " cintas"
+      );
+    }
     bool match = true;
-    size_t numTapes = std::min(currentSymbols.size(), readSyms.size());
-    for (size_t i = 0; i < numTapes; ++i) {
+    for (size_t i = 0; i < currentSymbols.size(); ++i) {
       if (readSyms[i].getValue() != currentSymbols[i].getValue()) {
         match = false;
         break;
       }
     }
-    
     if (match) {
       found = true;
       return transition;
@@ -170,34 +174,48 @@ const Transition& TuringMachineSimulator::findApplicableTransition(
  * @param heads Vector de posiciones de cabezas (se modificará).
  * @param currentState Estado actual (se modificará al estado destino).
  */
-void TuringMachineSimulator::applyTransition(const Transition& tr, 
+void TuringMachineSimulator::applyTransition(const Transition& transition, 
                                              std::vector<std::vector<Symbol>>& tapes, 
                                              std::vector<int>& heads, 
                                              State& currentState) const {
   int tapeCount = tapes.size();
-  const std::map<int, std::pair<Symbol, Moves>>& actions = tr.getTapeActions();
+  const std::map<int, std::pair<Symbol, Moves>>& actions = transition.getTapeActions();
+  if ((int)actions.size() != tapeCount) {
+    throw std::runtime_error(
+      "Error: La transición desde '" + transition.getFrom().getId() + 
+      "' a '" + transition.getTo().getId() + "' tiene " + 
+      std::to_string(actions.size()) + " acciones de escritura/movimiento, " +
+      "pero la máquina tiene " + std::to_string(tapeCount) + " cintas"
+    );
+  }
   for (const auto& pair : actions) {
     int tapeIndex = pair.first;
     const Symbol& writeSymbol = pair.second.first;
     Moves move = pair.second.second;
-    if (tapeIndex >= 0 && tapeIndex < tapeCount) {
-      tapes[tapeIndex][heads[tapeIndex]] = writeSymbol;
-      if (move == Moves::LEFT) {
-        if (heads[tapeIndex] == 0) {
-          tapes[tapeIndex].insert(tapes[tapeIndex].begin(), Symbol('.'));
-        } else {
-          heads[tapeIndex]--;
-        }
-      } else if (move == Moves::RIGHT) {
-        heads[tapeIndex]++;
-        if (heads[tapeIndex] == (int)tapes[tapeIndex].size()) {
-          tapes[tapeIndex].push_back(Symbol('.'));
-        }
-      }
-      // Si es STAY, no hacer nada
+    if (tapeIndex < 0 || tapeIndex >= tapeCount) {
+      throw std::runtime_error(
+        "Error: La transición desde '" + transition.getFrom().getId() + 
+        "' a '" + transition.getTo().getId() + "' intenta acceder a la cinta " + 
+        std::to_string(tapeIndex) + ", pero solo hay " + std::to_string(tapeCount) + " cintas"
+      );
     }
+    
+    tapes[tapeIndex][heads[tapeIndex]] = writeSymbol;
+    if (move == Moves::LEFT) {
+      if (heads[tapeIndex] == 0) {
+        tapes[tapeIndex].insert(tapes[tapeIndex].begin(), Symbol('.'));
+      } else {
+        heads[tapeIndex]--;
+      }
+    } else if (move == Moves::RIGHT) {
+      heads[tapeIndex]++;
+      if (heads[tapeIndex] == (int)tapes[tapeIndex].size()) {
+        tapes[tapeIndex].push_back(Symbol('.'));
+      }
+    }
+    // Si es STAY, no hacer nada
   }
-  const std::string& toId = tr.getTo().getId();
+  const std::string& toId = transition.getTo().getId();
   try {
     currentState = model_.getStateById(toId);
   } catch (const std::exception& e) {

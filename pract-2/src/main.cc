@@ -29,7 +29,6 @@ int main (int argc, char* argv[]) {
   FileParser parser;
   TuringMachineModel model = parser.parseFile(args.getMtFile());
   TuringMachineSimulator simulator(model);
-  
   if (args.getInfo()) {
     std::cout << "\n" << std::string(120, '=') << "\n";
     std::cout << "INFORMACIÓN DE LA MÁQUINA DE TURING\n";
@@ -37,7 +36,6 @@ int main (int argc, char* argv[]) {
     std::cout << model << "\n";
     std::cout << std::string(120, '=') << "\n\n";
   }
-  
   std::ifstream inputStrings(args.getStringsFile());
   if (!inputStrings.is_open()) {
     std::cerr << "No se pudo abrir el archivo de cadenas: " << args.getStringsFile() << std::endl;
@@ -45,7 +43,6 @@ int main (int argc, char* argv[]) {
   }
   std::ofstream resultFile("FileOut.txt");
   std::string inputString;
-
   while (std::getline(inputStrings, inputString)) {
     if (inputString.empty()) continue;
     std::vector<Symbol> symbols;

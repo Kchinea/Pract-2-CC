@@ -19,9 +19,9 @@ FileParser::~FileParser() {}
  */
 std::vector<std::string> FileParser::parseTokens(const std::string& line) {
 	std::vector<std::string> tokens;
-	std::stringstream ss(line);
+	std::stringstream stream(line);
 	std::string token;
-	while (ss >> token) {
+	while (stream >> token) {
 		tokens.push_back(token);
 	}
 	return tokens;
@@ -33,11 +33,11 @@ std::vector<std::string> FileParser::parseTokens(const std::string& line) {
  * @param s String a limpiar.
  * @return String sin espacios al inicio ni al final.
  */
-std::string FileParser::trim(const std::string& s) {
-	std::string res = s;
-	res.erase(0, res.find_first_not_of(" \t\n\r"));
-	res.erase(res.find_last_not_of(" \t\n\r") + 1);
-	return res;
+std::string FileParser::trim(const std::string& line) {
+	std::string result = line;
+	result.erase(0, result.find_first_not_of(" \t\n\r"));
+	result.erase(result.find_last_not_of(" \t\n\r") + 1);
+	return result;
 }
 
 /**
@@ -74,7 +74,6 @@ bool FileParser::readAndSplitSections(std::ifstream& infile,
 		if (comment != std::string::npos) line = line.substr(0, comment);
 		line = trim(line);
 		if (line.empty()) continue;
-
 		switch (section) {
 			case 0: states = parseTokens(line); break;
 			case 1: inputAlphabet = parseTokens(line); break;
@@ -122,9 +121,9 @@ std::vector<State> FileParser::buildStates(const std::vector<std::string>& state
 		State state(stateName);
 		stateObjects.push_back(state);
 	}
-	for (auto & st : stateObjects) {
-		for (const auto & acc : acceptStates) {
-			if (st.getId() == acc) st.setAccept(true);
+	for (auto & state_iter : stateObjects) {
+		for (const auto & accept : acceptStates) {
+			if ( state_iter.getId() == accept) state_iter.setAccept(true);
 		}
 	}
 	return stateObjects;
@@ -146,22 +145,17 @@ std::vector<State> FileParser::buildStates(const std::vector<std::string>& state
 std::vector<Transition> FileParser::parseTransitionLines(const std::vector<std::string>& transitions) {
 	std::vector<Transition> transitionObjects;
 	for (const auto& transLine : transitions) {
-		std::stringstream ss(transLine);
+		std::stringstream stream(transLine);
 		std::string fromState, readSym0Str, toState;
-		ss >> fromState >> readSym0Str >> toState;
-		
+		stream >> fromState >> readSym0Str >> toState;
 		State from(fromState);
 		State to(toState);
-		
 		std::vector<Symbol> readSymbols;
 		readSymbols.push_back((!readSym0Str.empty()) ? Symbol(readSym0Str[0]) : Symbol('.'));
-		
 		std::map<int, std::pair<Symbol, Moves>> tapeActions;
 		std::string writeSymStr, moveStr, readSymStr;
 		int tapeIndex = 0;
-		
-		// Primera cinta: leer escritura y movimiento
-		if (ss >> writeSymStr >> moveStr) {
+		if (stream >> writeSymStr >> moveStr) {
 			Symbol writeSymbol = (!writeSymStr.empty()) ? Symbol(writeSymStr[0]) : Symbol('.');
 			Moves move = Moves::STAY;
 			if (!moveStr.empty()) {
@@ -173,12 +167,9 @@ std::vector<Transition> FileParser::parseTransitionLines(const std::vector<std::
 			tapeActions.insert(std::make_pair(tapeIndex, std::make_pair(writeSymbol, move)));
 			tapeIndex++;
 		}
-		
-		// Resto de cintas: leer lectura, escritura, movimiento
-		while (ss >> readSymStr >> writeSymStr >> moveStr) {
+		while (stream >> readSymStr >> writeSymStr >> moveStr) {
 			Symbol readSym = (!readSymStr.empty()) ? Symbol(readSymStr[0]) : Symbol('.');
 			readSymbols.push_back(readSym);
-			
 			Symbol writeSymbol = (!writeSymStr.empty()) ? Symbol(writeSymStr[0]) : Symbol('.');
 			Moves move = Moves::STAY;
 			if (!moveStr.empty()) {
@@ -190,7 +181,6 @@ std::vector<Transition> FileParser::parseTransitionLines(const std::vector<std::
 			tapeActions.insert(std::make_pair(tapeIndex, std::make_pair(writeSymbol, move)));
 			tapeIndex++;
 		}
-		
 		Transition transition(from, to, readSymbols, tapeActions);
 		transitionObjects.push_back(transition);
 	}

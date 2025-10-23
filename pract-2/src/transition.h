@@ -21,10 +21,8 @@ class Transition {
     const State& getFrom() const { return from; }
     const State& getTo() const { return to; }
     const std::vector<Symbol>& getReadSymbols() const { return readSymbols; }
-    const std::map<int, std::pair<Symbol, Moves>>& getTapeActions() const { return tapeActions; }
-    
-    friend std::ostream& operator<<(std::ostream& os, const Transition& t);
-    
+    const std::map<int, std::pair<Symbol, Moves>>& getTapeActions() const { return tapeActions; }  
+    friend std::ostream& operator<<(std::ostream& os, const Transition& t);   
   private:
     State from;
     State to;

@@ -74,7 +74,7 @@ q0 a q1 X R . . R
 - Escribe `X` en cinta0 y mueve derecha (R)
 - Escribe `.` en cinta1 y mueve derecha (R)
 
-**Movimientos**: `L` (izquierda), `R` (derecha), `S` (stay/quieto)
+**Movimientos**: `L` (left/izquierda), `R` (rigth/derecha), `S` (stay/quieto)
 
 ### Archivo de cadenas:
 Una cadena por línea, sin espacios. Se carga en la cinta 0 al inicio.
@@ -83,14 +83,14 @@ Una cadena por línea, sin espacios. Se carga en la cinta 0 al inicio.
 
 ### Decisiones de Diseño Clave
 
-**Problema inicial**: La implementación original solo leía de la cinta 0, ignorando las demás cintas en transiciones multicinta.
+**Problema inicial**: La implementación principal, la primera vez que implemente de la carteristica adicional solo leía de la cinta 0, ignorando las demás cintas en transiciones multicinta.
 
-**Solución**: Refactorización completa para lectura intercalada de **todas las cintas**:
+**Solución**: Realice una refactorizacion completa para lectura de **todas las cintas**:
 1. `Transition` ahora almacena `vector<Symbol> readSymbols` (uno por cinta)
 2. El parser lee el formato intercalado: `read0 write0 mov0 read1 write1 mov1...`
 3. El simulador compara **todos** los símbolos de todas las cintas antes de aplicar una transición
 
-**Arquitectura**: Separación clara entre Modelo (datos) y Simulador (ejecución), eliminando el wrapper redundante inicial.
+**Arquitectura**: Separación clara entre Modelo (datos) y Simulador (ejecución)
 
 ### Clases Principales
 
@@ -98,7 +98,7 @@ Una cadena por línea, sin espacios. Se carga en la cinta 0 al inicio.
 **Propósito**: Representa la definición formal de la MT (estados, transiciones, alfabetos).
 
 **Responsabilidades**:
-- Almacena estados en `map<string, State>` para búsqueda O(1)
+- Almacena estados en `map<string, State>` para búsqueda mas eficiente
 - Indexa transiciones por estado origen: `map<string, vector<Transition>>`
 - Gestiona alfabetos de entrada y cinta
 - Provee métodos de consulta: `getState()`, `getTransitionsFrom()`, `isAcceptState()`
@@ -176,7 +176,7 @@ Cinta 1: [.]
 4. Si encuentra match: establece `found = true`, retorna transición
 5. Si no encuentra ninguna: establece `found = false`, retorna `emptyTransition_`
 
-**Optimización**: Usa el map de transiciones del modelo para acceso directo O(1) en lugar de buscar en lista completa O(n).
+**Optimización**: Usa el map de transiciones del modelo para acceso directo mas eficiente en lugar de buscar en lista completa con un vector.
 
 **Ejemplo de matching**:
 ```
@@ -203,7 +203,7 @@ Transición: q0 [a, ., .] → q1
    - **STAY (S)**: No hace nada
 
 3. **Cambio de estado**: Obtiene estado destino del modelo y actualiza `currentState`
-   - Usa `model_.getStateById()` para preservar flags de aceptación (búsqueda O(1) en map)
+   - Usa `model_.getStateById()` para preservar flags de aceptación (búsqueda en el map)
 
 **Ejemplo de aplicación**:
 ```
@@ -221,7 +221,7 @@ Estado: q0 → q1
 - Permite que el llamador acceda al resultado final
 - Solo cinta 0 se retorna (las demás son auxiliares)
 
-**Nota**: Si se quisieran ver todas las cintas, modificar esta función para retornar `tapes` completo.
+**Nota**: Si se quisieran ver todas las cintas, modificar esta la opcion `--trace` que muestra un output mucho mas completo.
 
 ---
 
@@ -229,6 +229,7 @@ Estado: q0 → q1
 - Expansión automática de cintas (crecen según necesidad)
 - Protección contra bucles infinitos (MAX_STEPS)
 - Validación de estados destino (lanza excepción si no existen)
+- Validación de la i tegridad de las transiciones, tienen acciones para todas las cintas 
 - Manejo de cabezales fuera de límites (retorna blanco)
 
 #### **Transition** (`transition.h/cc`)
@@ -243,7 +244,7 @@ class Transition {
 };
 ```
 
-**Cambio crítico**: Pasó de `Symbol readSymbol` (singular) a `vector<Symbol> readSymbols` para soportar lectura multicinta real.
+**Cambio principal**: Pasó de `Symbol readSymbol` (singular) a `vector<Symbol> readSymbols` para soportar lectura multicinta.
 
 #### **FileParser** (`file_parser.h/cc`)
 **Propósito**: Parsea archivos de definición de MT.
@@ -262,7 +263,7 @@ class Transition {
 Simple pero esencial: `State(string id, bool accept)`. Se usa en maps para búsqueda rápida.
 
 #### **Symbol** (`symbol.h/cc`)
-**Propósito**: Wrapper ligero sobre `char` con operadores de comparación.
+**Propósito**: Sigue el patron Wrapper sobre `char` con operadores de comparación.
 
 Permite usar `Symbol` en contenedores STL y simplifica el código del simulador.
 
@@ -328,8 +329,8 @@ Combinar ambos: `./pract-02 <MT> <strings> --info --trace`
 **Problema**: Diseñar una MT que acepte cadenas del lenguaje L = {a^n b^m | m > n, n ≥ 1}
 
 **Ejemplos**:
-- ✅ Acepta: `abb`, `abbb`, `aabbb`, `aaaabbbbbb`
-- ❌ Rechaza: `ab` (m no es > n), `aabb` (m = n), `aaabbb` (m = n), `ba`, `ε`
+- Acepta: `abb`, `abbb`, `aabbb`, `aaaabbbbbb`
+- Rechaza: `ab` (m no es > n), `aabb` (m = n), `aaabbb` (m = n), `ba`, `ε`
 
 **Estrategia de solución**:
 1. **Marcado por parejas**: Por cada 'a', marcar una 'b' con 'Y'
@@ -353,8 +354,8 @@ Estado q2: Regresar al inicio
 
 Estado q3: Verificación final
   - Debe existir al menos una 'b' sin marcar
-  - Si encuentra 'b': ✅ ACEPTAR
-  - Si no hay 'b's: ❌ RECHAZAR
+  - Si encuentra 'b': ACEPTAR
+  - Si no hay 'b's: RECHAZAR
 ```
 
 **Archivo**: `Inputs/MT/AnBn_Plus_MT.txt`
@@ -367,12 +368,11 @@ q2 . q0 . R      # Inicio alcanzado, procesar siguiente 'a'
 q0 Y q3 Y R      # Todas las 'a's procesadas, verificar
 q3 b qaccept b S # Existe 'b' sin marcar → ACEPTAR
 ```
-
-**Complejidad**: O(n·m) donde n = número de 'a's, m = número de 'b's
-
 ---
 
 ### Ejercicio 2: Contador de a's y b's
+
+#### Primera Solucion primero a's ,despues b's
 
 **Problema**: Diseñar una MT de 3 cintas que cuente 'a's y 'b's y produzca resultado en formato unario: `.1^(n_a+1).1^(n_b+1).`
 
@@ -432,7 +432,59 @@ q7 . q7 1 L 1 . L . . S    # Copiar y agregar +1
 
 **Resultado**: Cinta 0 contiene `.1^(n_a+1).1^(n_b+1).` donde n_a y n_b son los conteos.
 
-**Complejidad**: O(n) donde n = longitud de la cadena
+#### Segunda Solucion da igual el orden de a's y b's
+
+**Problema**: Diseñar una MT de 3 cintas que cuente 'a's y 'b's siendo que las a's y las b's pueden estar intercaladas y produzca resultado en formato unario: `.1^(n_a+1).1^(n_b+1).`
+
+**Ejemplos**:
+- `a` → `.11.1.` (1 'a' → dos 1's, 0 'b's → un 1)
+- `aa` → `.111.1.` (2 'a's → tres 1's, 0 'b's → un 1)
+- `abb` → `.11.111.` (1 'a' → dos 1's, 2 'b's → tres 1's)
+- `b` → `.1.11.` (0 'a's → un 1, 1 'b' → dos 1's)
+- `ba` → `.11.11.` (1 'a' → dos 1's, 1 'b's → dos 1's)
+- `bbaa` → `.111.111.` (2 'a's → tres 1's, 2 'b's → tres 1's)
+- `babab` → `.111.1111.` (2 'a' → tres 1's, 3 'b's → cuatro 1's)
+- `bab` → `.11.111.` (1 'a's → dos 1's, 2 'b's → tres 1's)
+
+**Estrategia de solución**:
+1. **Contar en las cintas auxiliares**: Borrar las a's y b's y usar cinta 1 como contador temporal de a's y la 2 como contador de b's
+2. **Copiar la cinta 1**: poner los 1's de la cinta uno en la cinta inicial
+3. **Copiar la cinta 2**: poner los 1's de la cinta dos en la cinta inicial
+
+**Algoritmo (3 cintas)**:
+```
+
+# Transiciones
+# q0: Copiar a's a cinta 1 y b's a la cinta 2 y el 1 de mas de las a
+q0 b q0 . R . . S . 1 R
+q0 a q0 . R . 1 R . . S
+q0 . q1 1 R . . L . . S
+
+# q1: poner todos los 1 de las a y el blanco entre medias
+q1 . q1 1 R 1 . L . . S
+q1 . q2 . R . . S . . L
+
+# q2: poner todos los 1 de b y el uno de mas de las b
+q2 . q2 1 R . . S 1 . L
+q2 . qaccept 1 R . . S . . S
+```
+
+**Archivo**: `Inputs/MT/CountAB_2Tapes_MT_Random.txt` (usa 3 cintas)
+
+**Transiciones clave**:
+```
+# añade el 1 extra de las a's
+q0 . q1 1 R . . L . . S
+
+
+# añade el blanco entre la cuenta de a's y b's
+q1 . q2 . R . . S . . L
+
+# añade el 1 extra de las b's
+q2 . qaccept 1 R . . S . . S
+```
+
+**Resultado**: Cinta 0 contiene `.1^(n_a+1).1^(n_b+1).` donde n_a y n_b son los conteos.
 
 ---
 

@@ -1,0 +1,35 @@
+# Máquina de Turing 2 cintas: Contador de 'a's y 'b's en formato unario
+# Convierte cadena a: .1^(n_a+1).1^(n_b+1).
+# Estrategia: Usar cinta 1 para contar, copiar a cinta 0
+
+# Estados
+q0 q1 q2 qaccept
+
+# Alfabeto de entrada
+a b
+
+# Alfabeto de cinta
+a b 1 .
+
+# Estado inicial
+q0
+
+# Símbolo blanco
+.
+
+# Estados de aceptación
+qaccept
+
+# Transiciones
+# q0: Copiar a's a cinta 1 y b's a la cinta 2 y el 1 de mas de las a
+q0 b q0 . R . . S . 1 R
+q0 a q0 . R . 1 R . . S
+q0 . q1 1 R . . L . . S
+
+# q1: poner todos los 1 de las a y el blanco entre medias
+q1 . q1 1 R 1 . L . . S
+q1 . q2 . R . . S . . L
+
+# q2: poner todos los 1 de b y el uno de mas de las b
+q2 . q2 1 R . . S 1 . L
+q2 . qaccept 1 R . . S . . S
